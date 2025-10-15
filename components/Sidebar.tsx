@@ -8,7 +8,7 @@ const navItems = [
   { href: '/jobs', icon: '📁', label: 'Jobs' },
   { href: '/jobs/create', icon: '➕', label: 'Create WO' },
   { href: '/technicians', icon: '👥', label: 'Technicians' },
-  { href: '/compliance', icon: '📊', label: 'Compliance' },
+  { href: '/compliance#frame-6', icon: '📊', label: 'Compliance' },
 ];
 
 export function Sidebar() {
@@ -20,7 +20,7 @@ export function Sidebar() {
         <Link
           key={item.href}
           href={item.href}
-          className={`sidebar-icon ${pathname === item.href ? 'active' : ''}`}
+          className={`sidebar-icon ${pathname.startsWith(item.href.replace(/#.*/,'')) ? 'active' : ''}`}
           aria-label={item.label}
           title={item.label}
         >
