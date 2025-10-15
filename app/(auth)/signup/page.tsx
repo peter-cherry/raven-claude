@@ -4,7 +4,6 @@ import { useState } from 'react';
 import Link from 'next/link';
 import { useAuth } from '@/components/AuthProvider';
 
-export const metadata = { title: 'Sign up' };
 
 export default function SignupPage() {
   const { signUp, signInWithGoogle, signInWithApple } = useAuth();

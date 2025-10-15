@@ -10,7 +10,6 @@ const mockData = [
   { id: 5, name: 'Curtis Jackson', state: 'NY', compliance: 'Full', city: 'Buffalo', score: 7.5, status: 'active' },
 ];
 
-export const metadata = { title: 'Compliance - Ravensearch' };
 
 export default function CompliancePage() {
   const [searchQuery, setSearchQuery] = useState('');

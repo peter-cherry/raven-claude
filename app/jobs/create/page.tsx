@@ -44,7 +44,6 @@ async function geocodeAddress(query: string) {
   return { success: false } as const;
 }
 
-export const metadata = { title: 'Create Work Order - Ravensearch' };
 
 export default function CreateJobPage() {
   const router = useRouter();
