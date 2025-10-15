@@ -5,8 +5,9 @@ import { usePathname } from 'next/navigation';
 
 const navItems = [
   { href: '/', icon: '🔍', label: 'Search' },
-  { href: '/jobs/create', icon: '📋', label: 'Jobs' },
-  { href: '/technicians/signup', icon: '👤', label: 'Technicians' },
+  { href: '/jobs', icon: '📁', label: 'Jobs' },
+  { href: '/jobs/create', icon: '➕', label: 'Create WO' },
+  { href: '/technicians', icon: '👥', label: 'Technicians' },
   { href: '/compliance', icon: '📊', label: 'Compliance' },
 ];
 
@@ -27,9 +28,9 @@ export function Sidebar() {
         </Link>
       ))}
       <div style={{ marginTop: 'auto' }}>
-        <div className="sidebar-icon" aria-label="Settings" title="Settings">
+        <Link href="/settings" className="sidebar-icon" aria-label="Settings" title="Settings">
           <span style={{ fontSize: '20px' }}>⚙️</span>
-        </div>
+        </Link>
       </div>
     </aside>
   );
