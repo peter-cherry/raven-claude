@@ -65,7 +65,7 @@ CREATE POLICY "Users can update jobs in their org"
   );
 
 -- Create indexes for better query performance
-CREATE INDEX idx_jobs_org_id ON jobs(org_id);
-CREATE INDEX idx_jobs_status ON jobs(job_status);
-CREATE INDEX idx_jobs_created_at ON jobs(created_at DESC);
-CREATE INDEX idx_jobs_trade_needed ON jobs(trade_needed);
+CREATE INDEX IF NOT EXISTS idx_jobs_org_id ON jobs(org_id);
+CREATE INDEX IF NOT EXISTS idx_jobs_status ON jobs(job_status);
+CREATE INDEX IF NOT EXISTS idx_jobs_created_at ON jobs(created_at DESC);
+CREATE INDEX IF NOT EXISTS idx_jobs_trade_needed ON jobs(trade_needed);
