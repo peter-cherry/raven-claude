@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from 'react';
-import { PolicyModal } from '@/components/PolicyModal';
 
 const mockData = [
   { id: 1, name: 'Armando Diego Maradona', state: 'CA', compliance: 'Full', city: 'Los Angeles', score: 7.5, status: 'active' },
@@ -11,10 +10,8 @@ const mockData = [
   { id: 5, name: 'Curtis Jackson', state: 'NY', compliance: 'Full', city: 'Buffalo', score: 7.5, status: 'active' },
 ];
 
-
 export default function CompliancePage() {
   const [searchQuery, setSearchQuery] = useState('');
-  const [showPolicyModal, setShowPolicyModal] = useState(false);
 
   const getScoreClass = (score: number) => {
     if (score >= 7) return 'high';
@@ -25,21 +22,15 @@ export default function CompliancePage() {
   return (
     <main className="content-area">
       <div className="content-inner">
-        <div style={{ maxWidth: '1200px', margin: '0 auto' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 16, marginBottom: 8 }}>
-            <h1 className="header-title" style={{ marginBottom: 0 }}>Compliance & Policies</h1>
-            <button onClick={() => setShowPolicyModal(true)} className="wo-icon-btn" aria-label="View policies" style={{ marginTop: 4 }}>
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
-                <path d="M6 2h7l5 5v13a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2z" stroke="currentColor" strokeWidth="1.5"/>
-                <path d="M13 2v5h5" stroke="currentColor" strokeWidth="1.5"/>
-              </svg>
-            </button>
+        <div className="compliance-container">
+          <div className="compliance-header">
+            <h1 className="header-title no-margin">Compliance & Policies</h1>
           </div>
           <p className="header-subtitle">Monitor technician compliance status</p>
 
-          <section id="frame-6" style={{ marginBottom: '16px' }} />
+          <section id="frame-6" className="section-spacer" />
 
-          <div className="search-wrapper" style={{ marginBottom: '24px' }}>
+          <div className="search-wrapper search-spacer">
             <input
               type="text"
               className="search-input"
@@ -68,7 +59,7 @@ export default function CompliancePage() {
               {mockData.map((item) => (
                 <tr key={item.id}>
                   <td>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                    <div className="tech-cell">
                       <span className={`status-dot ${item.status}`} />
                       <span>{item.name}</span>
                     </div>
@@ -82,7 +73,7 @@ export default function CompliancePage() {
                     </span>
                   </td>
                   <td>
-                    <button className="outline-button" style={{ fontSize: '12px', padding: '6px 12px' }}>
+                    <button className="outline-button outline-small">
                       See Reasons
                     </button>
                   </td>
@@ -92,7 +83,6 @@ export default function CompliancePage() {
           </table>
         </div>
       </div>
-      <PolicyModal isOpen={showPolicyModal} onClose={() => setShowPolicyModal(false)} />
     </main>
   );
 }
