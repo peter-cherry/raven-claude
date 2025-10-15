@@ -125,6 +125,9 @@ body {
 .tech-cell { display: flex; align-items: center; gap: 12px; }
 .outline-small { font-size: 12px; padding: 6px 12px; }
 
+/* Work order form error */
+.wo-error { color: var(--error, #EF4444); font-size: 12px; margin-top: 8px; }
+
 @media (max-width: 768px) {
   .sidebar { width: 64px; padding: 16px 0; }
   .main-content { margin-left: 64px; }
