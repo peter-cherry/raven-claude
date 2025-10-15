@@ -11,6 +11,7 @@ export default function HomePage() {
   const [showPolicyModal, setShowPolicyModal] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [success, setSuccess] = useState(false);
   const router = useRouter();
   const { user } = useAuth();
 
@@ -64,11 +65,17 @@ export default function HomePage() {
 
       // Clear input and show success
       setQ('');
-      alert('Work order submitted successfully! It will be processed by our parsing system.');
+      setSuccess(true);
+      setError(null);
+      console.log('Work order submitted successfully:', data);
+
+      // Hide success message after 5 seconds
+      setTimeout(() => setSuccess(false), 5000);
 
       // Optionally redirect to jobs list or parsing queue
       // router.push('/work-orders/pending');
     } catch (err) {
+      console.error('Form error:', err);
       setError(err instanceof Error ? err.message : 'An error occurred');
     } finally {
       setIsSubmitting(false);
@@ -117,6 +124,7 @@ export default function HomePage() {
               </button>
             </form>
             {error && <p className="wo-error">{error}</p>}
+            {success && <p style={{ color: 'var(--success, #10B981)', fontSize: 14, marginTop: 8, marginBottom: 0 }}>✓ Work order submitted successfully!</p>}
           </div>
           <div className="home-cta">
             <Link className="primary-button gradient-cta" href="/jobs/create">Create Work Order</Link>
