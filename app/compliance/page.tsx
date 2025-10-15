@@ -27,6 +27,8 @@ export default function CompliancePage() {
           <h1 className="header-title">Compliance & Policies</h1>
           <p className="header-subtitle">Monitor technician compliance status</p>
 
+          <section id="frame-6" style={{ marginBottom: '16px' }} />
+
           <div className="search-wrapper" style={{ marginBottom: '24px' }}>
             <input
               type="text"
