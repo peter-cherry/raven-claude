@@ -1,6 +1,11 @@
+"use client";
+
 import Link from 'next/link';
+import { useAuth } from '@/components/AuthProvider';
 
 export function TopBar() {
+  const { user, signOut } = useAuth();
+
   return (
     <header className="top-bar">
       <div className="logo-section">
@@ -10,8 +15,18 @@ export function TopBar() {
         <span className="brand-name">RAVENSEARCH</span>
       </div>
       <div className="auth-buttons">
-        <Link href="/login" className="outline-button">Login</Link>
-        <Link href="/signup" className="outline-button">Signup</Link>
+        {!user && (
+          <>
+            <Link href="/login" className="outline-button">Login</Link>
+            <Link href="/signup" className="outline-button">Signup</Link>
+          </>
+        )}
+        {user && (
+          <>
+            <Link href="/settings" className="outline-button">Settings</Link>
+            <button onClick={signOut} className="outline-button">Logout</button>
+          </>
+        )}
       </div>
     </header>
   );
