@@ -150,7 +150,6 @@ export default function CreateJobPage() {
               contact_phone: parsed.data.contact_phone,
               contact_email: parsed.data.contact_email,
               job_status: 'matching',
-              status: 'pending',
             })
             .select()
             .single();
