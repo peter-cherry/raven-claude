@@ -51,6 +51,9 @@ body {
 .wo-search-btn { width: 40px; height: 40px; display: grid; place-items: center; border-radius: 8px; background: var(--accent-primary); color: #fff; border: none; cursor: pointer; }
 .home-cta { display: flex; justify-content: center; margin-top: 12px; }
 
+/* CTA gradient variant */
+.gradient-cta { background: linear-gradient(90deg, #6C72C9, #8083AE); }
+
 .search-container { max-width: 720px; margin: 0 auto; }
 .search-wrapper { position: relative; }
 .search-input { width: 100%; padding: 16px 48px 16px 20px; border-radius: 12px; border: 2px solid var(--border-accent); background: var(--bg-secondary); color: var(--text-primary); font-size: 16px; outline: none; transition: all 0.2s; }
