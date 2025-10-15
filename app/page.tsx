@@ -1,33 +1,37 @@
 "use client";
 
-import { useState } from 'react';
 import Link from 'next/link';
+import { useState } from 'react';
 
 export default function HomePage() {
-  const [searchQuery, setSearchQuery] = useState('');
+  const [q, setQ] = useState('');
 
   return (
     <main className="content-area">
       <div className="content-inner center-viewport">
-        <div className="search-container">
-          <h1 className="header-title" style={{ textAlign: 'center' }}>Create a WO</h1>
-          <div className="search-wrapper">
-            <input
-              type="text"
-              className="search-input"
-              placeholder="Search..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-            />
-            <svg className="search-icon" width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <path d="M9 17C13.4183 17 17 13.4183 17 9C17 4.58172 13.4183 1 9 1C4.58172 1 1 4.58172 1 9C1 13.4183 4.58172 17 9 17Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-              <path d="M19 19L14.65 14.65" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-            </svg>
+        <section className="home-hero">
+          <div className="wo-panel">
+            <h2 className="wo-title">Create a WO  +</h2>
+            <div className="wo-search" role="search">
+              <button className="wo-icon-btn" aria-label="New work order" type="button">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M6 2h7l5 5v13a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2z" stroke="currentColor" strokeWidth="1.5"/>
+                  <path d="M13 2v5h5" stroke="currentColor" strokeWidth="1.5"/>
+                </svg>
+              </button>
+              <input className="wo-input" placeholder="Search" value={q} onChange={(e) => setQ(e.target.value)} />
+              <button className="wo-search-btn" aria-label="Search" type="button">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <circle cx="11" cy="11" r="7" stroke="currentColor" strokeWidth="1.5"/>
+                  <path d="M20 20l-3.5-3.5" stroke="currentColor" strokeWidth="1.5"/>
+                </svg>
+              </button>
+            </div>
           </div>
-          <div style={{ display: 'flex', justifyContent: 'center', marginTop: 16 }}>
+          <div className="home-cta">
             <Link className="primary-button" href="/jobs/create" style={{ background: 'linear-gradient(90deg, #6C72C9, #8083AE)' }}>Create Work Order</Link>
           </div>
-        </div>
+        </section>
       </div>
     </main>
   );
