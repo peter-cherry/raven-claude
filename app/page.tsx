@@ -69,11 +69,10 @@ export default function HomePage() {
       setError(null);
       console.log('Work order submitted successfully:', data);
 
-      // Hide success message after 5 seconds
-      setTimeout(() => setSuccess(false), 5000);
-
-      // Optionally redirect to jobs list or parsing queue
-      // router.push('/work-orders/pending');
+      // Redirect to work orders page after 2 seconds
+      setTimeout(() => {
+        router.push('/work-orders');
+      }, 2000);
     } catch (err) {
       console.error('Form error:', err);
       setError(err instanceof Error ? err.message : 'An error occurred');
