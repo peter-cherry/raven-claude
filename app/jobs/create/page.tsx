@@ -4,6 +4,7 @@ import { useRouter } from 'next/navigation';
 import { useMemo, useState } from 'react';
 import { z } from 'zod';
 import { supabase } from '@/lib/supabaseClient';
+import { useAuth } from '@/components/AuthProvider';
 
 const phoneRegex = /^(\(\d{3}\)\s?\d{3}-\d{4}|\d{3}-\d{3}-\d{4})$/;
 
@@ -47,15 +48,9 @@ async function geocodeAddress(query: string) {
 
 export default function CreateJobPage() {
   const router = useRouter();
+  const { user } = useAuth();
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [submitting, setSubmitting] = useState(false);
-
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    setErrors({});
-
-    const form = new FormData(e.currentTarget as any) as unknown as any; // placeholder var name shadowing below
-  };
 
   return (
     <main className="content-area">
@@ -96,9 +91,23 @@ export default function CreateJobPage() {
             return;
           }
 
+          // Get user's organization
+          let orgId = process.env.NEXT_PUBLIC_DEFAULT_ORG_ID;
+          if (user) {
+            const { data: membership } = await supabase
+              .from('org_memberships')
+              .select('org_id')
+              .eq('user_id', user.id)
+              .single();
+            if (membership?.org_id) {
+              orgId = membership.org_id;
+            }
+          }
+
           const { data: job, error } = await supabase
             .from('jobs')
             .insert({
+              org_id: orgId,
               job_title: parsed.data.job_title,
               description: parsed.data.description,
               trade_needed: parsed.data.trade_needed,
