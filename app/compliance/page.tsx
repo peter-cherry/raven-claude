@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from 'react';
+import { PolicyModal } from '@/components/PolicyModal';
 
 const mockData = [
   { id: 1, name: 'Armando Diego Maradona', state: 'CA', compliance: 'Full', city: 'Los Angeles', score: 7.5, status: 'active' },
