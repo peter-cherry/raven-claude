@@ -69,9 +69,32 @@ export default function HomePage() {
       setError(null);
       console.log('Work order submitted successfully:', data);
 
-      // Redirect to work orders page after 2 seconds
+      // Now trigger parsing and job creation
+      console.log('Parsing work order...');
+      const processResponse = await fetch('/api/work-orders/process', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          raw_work_order_id: data.raw_work_order_id,
+        }),
+      });
+
+      if (!processResponse.ok) {
+        const processError = await processResponse.json();
+        console.error('Processing error:', processError);
+        // Still show success but log the error
+        setTimeout(() => {
+          router.push('/work-orders');
+        }, 2000);
+        return;
+      }
+
+      const processData = await processResponse.json();
+      console.log('Processing complete:', processData);
+
+      // Redirect to search-unfolding with job ID to show matching technicians
       setTimeout(() => {
-        router.push('/work-orders');
+        router.push(`/search-unfolding?job_id=${processData.job_id}`);
       }, 2000);
     } catch (err) {
       console.error('Form error:', err);
