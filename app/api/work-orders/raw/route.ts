@@ -42,9 +42,13 @@ export async function POST(request: NextRequest) {
       .single();
 
     if (error) {
-      console.error('Error creating raw work order:', error);
+      console.error('Error creating raw work order:', {
+        message: error.message,
+        code: error.code,
+        details: error.details,
+      });
       return NextResponse.json(
-        { success: false, error: error.message || 'Failed to create work order' },
+        { success: false, error: `${error.message} (${error.code})` },
         { status: 500 }
       );
     }
