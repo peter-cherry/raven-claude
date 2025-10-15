@@ -28,18 +28,24 @@ const FormSchema = z.object({
 type FormData = z.infer<typeof FormSchema>;
 
 async function geocodeAddress(query: string) {
-  const token = process.env.NEXT_PUBLIC_MAPBOX_TOKEN;
-  const url = `https://api.mapbox.com/geocoding/v5/mapbox.places/${encodeURIComponent(query)}.json?access_token=${token}`;
+  const token = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY;
+  const url = `https://maps.googleapis.com/maps/api/geocode/json?address=${encodeURIComponent(query)}&key=${token}`;
   const res = await fetch(url);
   const data = await res.json();
-  if (data.features && data.features.length > 0) {
-    const result = data.features[0];
+  if (data.results && data.results.length > 0) {
+    const result = data.results[0];
+    const location = result.geometry.location;
+    const addressComponents = result.address_components;
+
+    const city = addressComponents.find((c: any) => c.types.includes('locality'))?.long_name ?? null;
+    const state = addressComponents.find((c: any) => c.types.includes('administrative_area_level_1'))?.short_name ?? null;
+
     return {
       success: true,
-      lat: result.center[1],
-      lng: result.center[0],
-      city: result.context?.find((c: any) => c.id.startsWith('place'))?.text ?? null,
-      state: result.context?.find((c: any) => c.id.startsWith('region'))?.short_code?.split('-')[1] ?? null,
+      lat: location.lat,
+      lng: location.lng,
+      city,
+      state,
     } as const;
   }
   return { success: false } as const;
