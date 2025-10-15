@@ -1,11 +1,13 @@
 "use client";
 
 import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useAuth } from '@/components/AuthProvider';
 
 
 export default function SignupPage() {
+  const router = useRouter();
   const { signUp, signInWithGoogle, signInWithApple } = useAuth();
   const [fullName, setFullName] = useState('');
   const [email, setEmail] = useState('');
@@ -24,9 +26,9 @@ export default function SignupPage() {
     try {
       const defaultOrg = process.env.NEXT_PUBLIC_DEFAULT_ORG_ID;
       await signUp(fullName, email, password, defaultOrg);
+      router.push('/');
     } catch (err: any) {
       setError(err.message || 'Unable to sign up');
-    } finally {
       setLoading(false);
     }
   };
