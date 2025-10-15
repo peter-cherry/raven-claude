@@ -54,8 +54,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
     const newUserId = data.user?.id;
     if (newUserId && orgId) {
-      await supabase.from('org_memberships').insert({ user_id: newUserId, org_id: orgId });
+      const { error: memberError } = await supabase.from('org_memberships').insert({ user_id: newUserId, org_id: orgId });
+      if (memberError) console.error('Failed to add user to org:', memberError);
     }
+
+    if (!data.user) throw new Error('Failed to create user account');
   };
 
   const signInWithGoogle = async () => {
