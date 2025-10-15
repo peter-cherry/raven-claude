@@ -92,6 +92,7 @@ export default function CompliancePage() {
           </table>
         </div>
       </div>
+      <PolicyModal isOpen={showPolicyModal} onClose={() => setShowPolicyModal(false)} />
     </main>
   );
 }
