@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from 'react';
+import Link from 'next/link';
 
 export default function HomePage() {
   const [searchQuery, setSearchQuery] = useState('');
@@ -22,6 +23,9 @@ export default function HomePage() {
               <path d="M9 17C13.4183 17 17 13.4183 17 9C17 4.58172 13.4183 1 9 1C4.58172 1 1 4.58172 1 9C1 13.4183 4.58172 17 9 17Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
               <path d="M19 19L14.65 14.65" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
             </svg>
+          </div>
+          <div style={{ display: 'flex', justifyContent: 'center', marginTop: 16 }}>
+            <Link className="primary-button" href="/jobs/create" style={{ background: 'linear-gradient(90deg, #6C72C9, #8083AE)' }}>Create Work Order</Link>
           </div>
         </div>
       </div>
