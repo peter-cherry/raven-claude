@@ -1,4 +1,4 @@
-import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
+import { createClient } from '@supabase/supabase-js';
 import { NextRequest, NextResponse } from 'next/server';
 
 export async function POST(request: NextRequest) {
@@ -13,21 +13,46 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Get the auth token from cookies (Supabase stores it there)
-    const cookie = request.headers.get('cookie') || '';
+    // Create Supabase client
+    const supabase = createClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+    );
 
-    if (!cookie) {
+    // Get auth token from Authorization header or cookies
+    let token = null;
+    const authHeader = request.headers.get('authorization');
+    if (authHeader?.startsWith('Bearer ')) {
+      token = authHeader.substring(7);
+    } else {
+      // Try to extract from cookie
+      const cookies = request.headers.get('cookie') || '';
+      const match = cookies.match(/sb-auth-token=([^;]+)/);
+      if (match) token = match[1];
+    }
+
+    if (!token) {
       return NextResponse.json(
         { success: false, error: 'Not authenticated' },
         { status: 401 }
       );
     }
 
-    // Create Supabase client for server-side use
-    const supabase = createClientComponentClient();
+    // Set the auth token for this request
+    const supabaseAuth = createClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+      {
+        global: {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        },
+      }
+    );
 
-    // Get current user from session
-    const { data: { user }, error: userError } = await supabase.auth.getUser();
+    // Get current user
+    const { data: { user }, error: userError } = await supabaseAuth.auth.getUser();
 
     if (userError || !user) {
       console.error('Auth error:', userError);
@@ -38,52 +63,26 @@ export async function POST(request: NextRequest) {
     }
 
     // Get user's organization
-    const { data: membership, error: memberError } = await supabase
+    const { data: membership, error: memberError } = await supabaseAuth
       .from('org_memberships')
       .select('org_id')
       .eq('user_id', user.id)
       .single();
 
-    if (memberError || !membership) {
-      console.error('Membership error:', memberError);
-      // Allow insertion without org for now (testing)
-      const orgId = process.env.NEXT_PUBLIC_DEFAULT_ORG_ID || user.id;
+    const orgId = membership?.org_id || process.env.NEXT_PUBLIC_DEFAULT_ORG_ID;
 
-      const { data, error: insertError } = await supabase
-        .from('raw_work_orders')
-        .insert({
-          org_id: orgId,
-          raw_text: raw_text.trim(),
-          source,
-          status: 'pending',
-          created_by: user.id,
-        })
-        .select()
-        .single();
-
-      if (insertError) {
-        console.error('Error creating raw work order:', insertError);
-        return NextResponse.json(
-          { success: false, error: insertError.message || 'Failed to create work order' },
-          { status: 500 }
-        );
-      }
-
+    if (!orgId) {
       return NextResponse.json(
-        {
-          success: true,
-          raw_work_order_id: data.id,
-          message: 'Work order submitted for parsing',
-        },
-        { status: 201 }
+        { success: false, error: 'Could not determine organization' },
+        { status: 403 }
       );
     }
 
-    // Insert raw work order with user's org
-    const { data, error } = await supabase
+    // Insert raw work order
+    const { data, error } = await supabaseAuth
       .from('raw_work_orders')
       .insert({
-        org_id: membership.org_id,
+        org_id: orgId,
         raw_text: raw_text.trim(),
         source,
         status: 'pending',
