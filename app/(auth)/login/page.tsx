@@ -1,11 +1,13 @@
 "use client";
 
 import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useAuth } from '@/components/AuthProvider';
 
 
 export default function LoginPage() {
+  const router = useRouter();
   const { signIn, signInWithGoogle, signInWithApple } = useAuth();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -18,9 +20,9 @@ export default function LoginPage() {
     setLoading(true);
     try {
       await signIn(email, password);
+      router.push('/');
     } catch (err: any) {
       setError(err.message || 'Unable to sign in');
-    } finally {
       setLoading(false);
     }
   };
