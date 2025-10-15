@@ -2,7 +2,15 @@
 
 import { useState } from 'react';
 
-const policies = [
+interface PolicyItem {
+  id: number;
+  name: string;
+  currency: string;
+  amount: string;
+  checked: boolean;
+}
+
+const initialPolicies: PolicyItem[] = [
   { id: 1, name: 'GL', currency: 'USD', amount: '6,000,000', checked: true },
   { id: 2, name: 'AUTO', currency: 'USD', amount: '2,000,000', checked: false },
   { id: 3, name: 'WCRL', currency: 'USD', amount: '6,000,000', checked: false },
@@ -18,7 +26,7 @@ interface PolicyModalProps {
 }
 
 export function PolicyModal({ isOpen, onClose }: PolicyModalProps) {
-  const [selected, setSelected] = useState<number[]>([1]);
+  const [items, setItems] = useState<PolicyItem[]>(initialPolicies);
 
   if (!isOpen) return null;
 
@@ -26,24 +34,31 @@ export function PolicyModal({ isOpen, onClose }: PolicyModalProps) {
     <div className="policy-modal-overlay" onClick={onClose}>
       <div className="policy-modal-card" onClick={(e) => e.stopPropagation()}>
         <div className="policy-list">
-          {policies.map((policy) => (
+          {items.map((policy) => (
             <div key={policy.id} className="policy-row">
               <input
                 type="checkbox"
-                checked={selected.includes(policy.id)}
+                checked={policy.checked}
                 onChange={(e) => {
-                  if (e.target.checked) {
-                    setSelected([...selected, policy.id]);
-                  } else {
-                    setSelected(selected.filter((id) => id !== policy.id));
-                  }
+                  const checked = e.target.checked;
+                  setItems((prev) => prev.map((p) => p.id === policy.id ? { ...p, checked } : p));
                 }}
                 className="policy-checkbox"
               />
               <span className="policy-name">{policy.name}</span>
               <span className="policy-currency">{policy.currency}</span>
               <span className="policy-divider">-</span>
-              <span className="policy-amount">{policy.amount}</span>
+              <input
+                className="policy-amount-input"
+                value={policy.amount}
+                onChange={(e) => {
+                  const raw = e.target.value;
+                  // allow digits and commas only
+                  const next = raw.replace(/[^0-9,]/g, '');
+                  setItems((prev) => prev.map((p) => p.id === policy.id ? { ...p, amount: next } : p));
+                }}
+                aria-label={`${policy.name} amount`}
+              />
               <button className="policy-menu-btn" aria-label="Options">
                 <svg width="4" height="16" viewBox="0 0 4 16" fill="none">
                   <circle cx="2" cy="2" r="2" fill="currentColor"/>
@@ -56,6 +71,7 @@ export function PolicyModal({ isOpen, onClose }: PolicyModalProps) {
         </div>
         <div className="policy-footer">
           <span className="policy-footer-text">Insert details wherever they reside on this page</span>
+          <button className="primary-button" onClick={onClose}>Done</button>
         </div>
       </div>
     </div>
