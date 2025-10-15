@@ -19,15 +19,8 @@ export async function POST(request: NextRequest) {
       process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
     );
 
-    // Use default org for testing
-    const orgId = process.env.NEXT_PUBLIC_DEFAULT_ORG_ID;
-
-    if (!orgId) {
-      return NextResponse.json(
-        { success: false, error: 'NEXT_PUBLIC_DEFAULT_ORG_ID not configured' },
-        { status: 500 }
-      );
-    }
+    // Use default org for testing (allow NULL for now)
+    const orgId = process.env.NEXT_PUBLIC_DEFAULT_ORG_ID || null;
 
     // Insert raw work order
     const { data, error } = await supabase
