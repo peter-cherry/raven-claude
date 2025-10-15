@@ -1,46 +1,234 @@
+"use client";
+
+import { useRouter } from 'next/navigation';
+import { useMemo, useState } from 'react';
+import { z } from 'zod';
+import { supabase } from '@/lib/supabaseClient';
+
+const phoneRegex = /^(\(\d{3}\)\s?\d{3}-\d{4}|\d{3}-\d{3}-\d{4})$/;
+
+const FormSchema = z.object({
+  job_title: z.string().min(1).max(200),
+  description: z.string().optional(),
+  trade_needed: z.enum(['HVAC','Plumbing','Electrical','Handyman','Facilities Tech','Other']),
+  required_certifications: z.array(z.string()).optional().default([]),
+  address_text: z.string().min(1),
+  scheduled_start_ts: z.string().min(1),
+  duration: z.string().optional(),
+  urgency: z.enum(['emergency','same_day','next_day','within_week','flexible']),
+  budget_min: z.coerce.number().optional(),
+  budget_max: z.coerce.number().optional(),
+  pay_rate: z.string().optional(),
+  contact_name: z.string().min(1),
+  contact_phone: z.string().regex(phoneRegex, 'Phone must be (555) 123-4567 or 555-123-4567'),
+  contact_email: z.string().email(),
+});
+
+type FormData = z.infer<typeof FormSchema>;
+
+async function geocodeAddress(query: string) {
+  const token = process.env.NEXT_PUBLIC_MAPBOX_TOKEN;
+  const url = `https://api.mapbox.com/geocoding/v5/mapbox.places/${encodeURIComponent(query)}.json?access_token=${token}`;
+  const res = await fetch(url);
+  const data = await res.json();
+  if (data.features && data.features.length > 0) {
+    const result = data.features[0];
+    return {
+      success: true,
+      lat: result.center[1],
+      lng: result.center[0],
+      city: result.context?.find((c: any) => c.id.startsWith('place'))?.text ?? null,
+      state: result.context?.find((c: any) => c.id.startsWith('region'))?.short_code?.split('-')[1] ?? null,
+    } as const;
+  }
+  return { success: false } as const;
+}
+
 export const metadata = { title: 'Create Work Order - Ravensearch' };
 
 export default function CreateJobPage() {
+  const router = useRouter();
+  const [errors, setErrors] = useState<Record<string, string>>({});
+  const [submitting, setSubmitting] = useState(false);
+
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    setErrors({});
+
+    const form = new FormData(e.currentTarget as any) as unknown as any; // placeholder var name shadowing below
+  };
+
   return (
     <main className="content-area">
       <div className="content-inner center-viewport">
-        <form className="container-card" aria-label="Work order form">
+        <form className="container-card form-grid" onSubmit={async (e) => {
+          e.preventDefault();
+          setErrors({});
+          setSubmitting(true);
+          const fd = new globalThis.FormData(e.currentTarget as HTMLFormElement);
+          const payload: Partial<FormData> = {
+            job_title: String(fd.get('job_title') || ''),
+            description: String(fd.get('description') || ''),
+            trade_needed: String(fd.get('trade_needed') || 'HVAC') as any,
+            address_text: String(fd.get('address_text') || ''),
+            scheduled_start_ts: String(fd.get('scheduled_start_ts') || ''),
+            duration: String(fd.get('duration') || ''),
+            urgency: String(fd.get('urgency') || 'within_week') as any,
+            budget_min: fd.get('budget_min') ? Number(fd.get('budget_min')) : undefined,
+            budget_max: fd.get('budget_max') ? Number(fd.get('budget_max')) : undefined,
+            pay_rate: String(fd.get('pay_rate') || ''),
+            contact_name: String(fd.get('contact_name') || ''),
+            contact_phone: String(fd.get('contact_phone') || ''),
+            contact_email: String(fd.get('contact_email') || ''),
+          };
+          const parsed = FormSchema.safeParse(payload);
+          if (!parsed.success) {
+            const errs: Record<string, string> = {};
+            for (const issue of parsed.error.issues) errs[issue.path.join('.')] = issue.message;
+            setErrors(errs);
+            setSubmitting(false);
+            return;
+          }
+
+          const geo = await geocodeAddress(parsed.data.address_text);
+          if (!geo.success) {
+            setErrors({ address_text: 'Unable to find address' });
+            setSubmitting(false);
+            return;
+          }
+
+          const { data: job, error } = await supabase
+            .from('jobs')
+            .insert({
+              job_title: parsed.data.job_title,
+              description: parsed.data.description,
+              trade_needed: parsed.data.trade_needed,
+              required_certifications: parsed.data.required_certifications ?? [],
+              address_text: parsed.data.address_text,
+              city: geo.city,
+              state: geo.state,
+              lat: geo.lat,
+              lng: geo.lng,
+              scheduled_at: parsed.data.scheduled_start_ts,
+              duration: parsed.data.duration,
+              urgency: parsed.data.urgency,
+              budget_min: parsed.data.budget_min,
+              budget_max: parsed.data.budget_max,
+              pay_rate: parsed.data.pay_rate,
+              contact_name: parsed.data.contact_name,
+              contact_phone: parsed.data.contact_phone,
+              contact_email: parsed.data.contact_email,
+              job_status: 'matching',
+              status: 'pending',
+            })
+            .select()
+            .single();
+
+          if (error || !job) {
+            setErrors({ form: error?.message || 'Failed to create job' });
+            setSubmitting(false);
+            return;
+          }
+
+          await supabase.rpc('find_matching_technicians', {
+            p_job_id: job.id,
+            p_lat: geo.lat,
+            p_lng: geo.lng,
+            p_trade: parsed.data.trade_needed,
+            p_state: geo.state,
+            p_max_distance_m: 40000,
+          });
+
+          router.push(`/search-unfolding?job_id=${job.id}`);
+        }} aria-label="Work order form">
           <h1 className="header-title">Create work order</h1>
           <p className="header-subtitle">Provide job details for technician assignment</p>
 
           <div className="form-grid">
             <div className="form-field">
-              <label className="form-label" htmlFor="title">Work order title</label>
-              <input className="text-input" id="title" name="title" required />
+              <label className="form-label" htmlFor="job_title">Work order title</label>
+              <input className="text-input" id="job_title" name="job_title" />
+              {errors.job_title && <span style={{ color: 'var(--error)' }}>{errors.job_title}</span>}
             </div>
 
             <div className="form-field">
-              <label className="form-label" htmlFor="category">Category</label>
-              <select className="select-input" id="category" name="category" required>
-                <option value="">Select category</option>
-                <option value="installation">Installation</option>
-                <option value="maintenance">Maintenance</option>
-                <option value="repair">Repair</option>
-                <option value="inspection">Inspection</option>
+              <label className="form-label" htmlFor="description">Description</label>
+              <textarea className="textarea-input" id="description" name="description" />
+            </div>
+
+            <div className="form-field">
+              <label className="form-label" htmlFor="trade_needed">Trade needed</label>
+              <select className="select-input" id="trade_needed" name="trade_needed" defaultValue="HVAC">
+                <option>HVAC</option>
+                <option>Plumbing</option>
+                <option>Electrical</option>
+                <option>Handyman</option>
+                <option>Facilities Tech</option>
+                <option>Other</option>
               </select>
             </div>
 
             <div className="form-field">
-              <label className="form-label" htmlFor="scheduledAt">Scheduled date & time</label>
-              <input className="text-input" type="datetime-local" id="scheduledAt" name="scheduledAt" required />
+              <label className="form-label" htmlFor="address_text">Address</label>
+              <input className="text-input" id="address_text" name="address_text" />
+              {errors.address_text && <span style={{ color: 'var(--error)' }}>{errors.address_text}</span>}
             </div>
 
             <div className="form-field">
-              <label className="form-label" htmlFor="location">Location</label>
-              <input className="text-input" id="location" name="location" placeholder="Address or coordinates" required />
+              <label className="form-label" htmlFor="scheduled_start_ts">Scheduled start</label>
+              <input className="text-input" type="datetime-local" id="scheduled_start_ts" name="scheduled_start_ts" />
             </div>
 
             <div className="form-field">
-              <label className="form-label" htmlFor="notes">Additional notes</label>
-              <textarea className="textarea-input" id="notes" name="notes" placeholder="Any special instructions or requirements..." />
+              <label className="form-label" htmlFor="urgency">Urgency</label>
+              <select className="select-input" id="urgency" name="urgency" defaultValue="within_week">
+                <option value="emergency">Emergency</option>
+                <option value="same_day">Same day</option>
+                <option value="next_day">Next day</option>
+                <option value="within_week">Within a week</option>
+                <option value="flexible">Flexible</option>
+              </select>
             </div>
 
-            <button className="primary-button" type="submit">Submit work order</button>
+            <div className="form-field">
+              <label className="form-label" htmlFor="duration">Duration</label>
+              <input className="text-input" id="duration" name="duration" placeholder="e.g., 2-3 hours" />
+            </div>
+
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+              <div className="form-field">
+                <label className="form-label" htmlFor="budget_min">Budget min</label>
+                <input className="text-input" id="budget_min" name="budget_min" type="number" />
+              </div>
+              <div className="form-field">
+                <label className="form-label" htmlFor="budget_max">Budget max</label>
+                <input className="text-input" id="budget_max" name="budget_max" type="number" />
+              </div>
+            </div>
+
+            <div className="form-field">
+              <label className="form-label" htmlFor="pay_rate">Pay rate</label>
+              <input className="text-input" id="pay_rate" name="pay_rate" placeholder="$75/hr" />
+            </div>
+
+            <div className="form-field">
+              <label className="form-label" htmlFor="contact_name">Contact name</label>
+              <input className="text-input" id="contact_name" name="contact_name" />
+            </div>
+
+            <div className="form-field">
+              <label className="form-label" htmlFor="contact_phone">Contact phone</label>
+              <input className="text-input" id="contact_phone" name="contact_phone" placeholder="(555) 123-4567" />
+              {errors.contact_phone && <span style={{ color: 'var(--error)' }}>{errors.contact_phone}</span>}
+            </div>
+
+            <div className="form-field">
+              <label className="form-label" htmlFor="contact_email">Contact email</label>
+              <input className="text-input" id="contact_email" name="contact_email" type="email" />
+            </div>
+
+            {errors.form && <div style={{ color: 'var(--error)' }}>{errors.form}</div>}
+            <button className="primary-button" disabled={submitting} type="submit" style={{ background: 'linear-gradient(90deg, #6C72C9, #8083AE)' }}>Create Work Order</button>
           </div>
         </form>
       </div>
