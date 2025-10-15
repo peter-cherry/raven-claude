@@ -41,6 +41,16 @@ body {
 .center-viewport { min-height: calc(100vh - 88px); display: grid; place-items: center; padding: 24px; }
 .container-card { width: 100%; max-width: 520px; background: var(--bg-card); border: 1px solid var(--border-accent); border-radius: 12px; padding: 32px; box-shadow: var(--shadow-md, 0 4px 6px rgba(0,0,0,0.1)); }
 
+/* Home hero */
+.home-hero { width: 100%; max-width: 960px; margin: 0 auto; display: grid; gap: 12px; }
+.wo-panel { background: var(--bg-secondary); border: 2px solid var(--border-accent); border-radius: 12px; padding: 28px; display: grid; gap: 12px; }
+.wo-title { text-align: center; color: var(--text-secondary); font-weight: 600; }
+.wo-search { display: grid; grid-template-columns: auto 1fr auto; align-items: center; gap: 8px; background: var(--bg-secondary); border: 2px solid var(--border-accent); border-radius: 10px; padding: 6px; }
+.wo-icon-btn { width: 40px; height: 40px; display: grid; place-items: center; border-radius: 8px; color: var(--text-secondary); border: 1px solid var(--border-subtle); background: transparent; cursor: pointer; }
+.wo-input { width: 100%; height: 40px; border: none; outline: none; background: transparent; color: var(--text-primary); padding: 0 8px; }
+.wo-search-btn { width: 40px; height: 40px; display: grid; place-items: center; border-radius: 8px; background: var(--accent-primary); color: #fff; border: none; cursor: pointer; }
+.home-cta { display: flex; justify-content: center; margin-top: 12px; }
+
 .search-container { max-width: 720px; margin: 0 auto; }
 .search-wrapper { position: relative; }
 .search-input { width: 100%; padding: 16px 48px 16px 20px; border-radius: 12px; border: 2px solid var(--border-accent); background: var(--bg-secondary); color: var(--text-primary); font-size: 16px; outline: none; transition: all 0.2s; }
