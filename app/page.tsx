@@ -37,17 +37,30 @@ export default function HomePage() {
         body: JSON.stringify({
           raw_text: q,
           source: 'search_input',
-          org_id: user.id,
         }),
       });
 
-      const data = await response.json();
-
       if (!response.ok) {
-        setError(data.error || 'Failed to submit work order');
+        const contentType = response.headers.get('content-type');
+        let errorMsg = 'Failed to submit work order';
+
+        if (contentType?.includes('application/json')) {
+          try {
+            const data = await response.json();
+            errorMsg = data.error || errorMsg;
+          } catch {
+            errorMsg = `Server error (${response.status})`;
+          }
+        } else {
+          errorMsg = `Server error (${response.status})`;
+        }
+
+        setError(errorMsg);
         setIsSubmitting(false);
         return;
       }
+
+      const data = await response.json();
 
       // Clear input and show success
       setQ('');
