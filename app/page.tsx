@@ -135,7 +135,7 @@ export default function HomePage() {
                 </svg>
               </Link>
               <Link href="/jobs/create" className="sub-action action-right" aria-label="Open create work order">
-                <img className="sub-action-img" src="https://cdn.builder.io/api/v1/image/assets%2Fd7e7e3dd91284e2dbc17f9afe5047bd6%2F4ded1e3044704cfcb0fdb7ab3b247050?format=webp&width=64" alt="Raven logo" width="20" height="20" />
+                <span className="sub-action-logo" aria-hidden="true"></span>
               </Link>
             </div>
             </div>
