@@ -71,13 +71,56 @@ async function geocodeAddress(query: string) {
 
 export default function CreateJobPage() {
   const router = useRouter();
+  const params = useSearchParams();
   const { user } = useAuth();
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [submitting, setSubmitting] = useState(false);
+  const [scores, setScores] = useState<any[] | null>(null);
+  const [techMap, setTechMap] = useState<Record<string, { id: string; full_name: string | null; city: string | null; state: string | null }>>({});
+
+  useEffect(() => {
+    const policyId = params.get('policy_id');
+    if (!policyId) return;
+    getPolicyScores(policyId)
+      .then(async (d) => {
+        const sorted = (d ?? []).sort((a: any, b: any) => b.score - a.score);
+        setScores(sorted);
+        const topIds = sorted.slice(0, 5).map((x: any) => x.technician_id);
+        if (topIds.length) {
+          const { data } = await supabase.from('technicians').select('id, full_name, city, state').in('id', topIds);
+          const map: Record<string, any> = {};
+          (data ?? []).forEach((t: any) => { map[t.id] = t; });
+          setTechMap(map);
+        }
+      })
+      .catch(() => setScores([]));
+  }, [params]);
 
   return (
     <main className="content-area">
       <div className="content-inner center-viewport">
+        {scores && (
+          <div className="container-card" style={{ marginBottom: 16 }}>
+            <div style={{ fontWeight: 700, marginBottom: 8 }}>Top matches for policy (preview)</div>
+            <div style={{ display: 'grid', gap: 8 }}>
+              {scores.slice(0,5).map((s: any, idx: number) => {
+                const t = techMap[s.technician_id];
+                return (
+                  <div key={s.technician_id} className="container-card" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '8px 10px' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                      <span style={{ width: 18, textAlign: 'right', fontWeight: 700 }}>{idx+1}</span>
+                      <div>
+                        <div style={{ fontWeight: 600 }}>{t?.full_name ?? s.technician_id.slice(0,8)}</div>
+                        <div style={{ color: 'var(--text-secondary)', fontSize: 12 }}>{t?.city ?? ''} {t?.state ?? ''}</div>
+                      </div>
+                    </div>
+                    <span className="outline-button" style={{ padding: '4px 10px' }}>{s.score}</span>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        )}
         <form className="container-card form-grid" onSubmit={async (e) => {
           e.preventDefault();
           setErrors({});
