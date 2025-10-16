@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { cookies } from 'next/headers';
 import { createRouteHandlerClient } from '@supabase/auth-helpers-nextjs';
+import { createClient } from '@supabase/supabase-js';
 
 export async function POST(req: Request) {
   try {
@@ -12,15 +13,31 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: 'org_id and items are required' }, { status: 400 });
     }
 
-    const supabase = createRouteHandlerClient({ cookies });
-    const { data: { session } } = await supabase.auth.getSession();
-    if (!session) return NextResponse.json({ error: 'Not authenticated' }, { status: 401 });
+    const authHeader = req.headers.get('authorization') || req.headers.get('Authorization') || '';
+
+    // Prefer Authorization header if present; fallback to cookie-based auth
+    let supabase: ReturnType<typeof createRouteHandlerClient> | ReturnType<typeof createClient> | any;
+    let userId: string | null = null;
+
+    if (authHeader && authHeader.startsWith('Bearer ')) {
+      const url = process.env.NEXT_PUBLIC_SUPABASE_URL as string;
+      const anon = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY as string;
+      supabase = createClient(url, anon, { global: { headers: { Authorization: authHeader } } });
+      const { data: userRes } = await supabase.auth.getUser();
+      userId = userRes?.user?.id ?? null;
+    } else {
+      supabase = createRouteHandlerClient({ cookies });
+      const { data: sess } = await supabase.auth.getSession();
+      userId = sess.session?.user?.id ?? null;
+    }
+
+    if (!userId) return NextResponse.json({ error: 'Not authenticated' }, { status: 401 });
 
     const { data: membership } = await supabase
       .from('org_memberships')
       .select('org_id')
       .eq('org_id', org_id)
-      .eq('user_id', session.user.id)
+      .eq('user_id', userId)
       .single();
     if (!membership) return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
 
