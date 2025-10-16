@@ -31,13 +31,13 @@ export async function createDraftPolicy(orgId: string, items: PolicyItemInput[])
     const req = await ensureRequirement(orgId, it.requirement_type, it.weight, it.min_valid_days ?? 0);
     const { error: iErr } = await supabase
       .from('compliance_policy_items')
-      .insert({
+      .upsert({
         policy_id: policy.id,
         requirement_id: req.id,
         required: it.required,
         min_valid_days: it.min_valid_days ?? 0,
         weight: it.weight,
-      });
+      }, { onConflict: 'policy_id,requirement_id' });
     if (iErr) throw iErr;
   }
   return policy.id as string;
