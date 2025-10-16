@@ -34,26 +34,17 @@ export async function POST(req: Request) {
 
     if (!userId) return NextResponse.json({ error: 'Not authenticated' }, { status: 401 });
 
-    let { data: membership } = await supabase
+    // Try to ensure membership but do not block on failure (RLS varies per table)
+    await supabase
       .from('org_memberships')
-      .select('org_id')
-      .eq('org_id', org_id)
-      .eq('user_id', userId)
-      .single();
+      .upsert({ user_id: userId, org_id }, { onConflict: 'user_id,org_id' });
 
-    if (!membership) {
-      const { error: mErr } = await supabase
-        .from('org_memberships')
-        .upsert({ user_id: userId, org_id }, { onConflict: 'user_id,org_id' });
-      if (mErr) return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
-      membership = { org_id };
-    }
-
-    const { data: policy, error: pErr } = await supabase
+    const { data: policy, error: pErr, status: pStatus } = await supabase
       .from('compliance_policies')
       .insert({ org_id, status: 'draft' })
       .select('id')
       .single();
+    if (pErr || !policy) return NextResponse.json({ error: pErr?.message || 'Insert policy failed' }, { status: pStatus || 400 });
     if (pErr) throw pErr;
 
     for (const it of items) {
