@@ -27,10 +27,24 @@ export default function SearchUnfoldingPage() {
   const params = useSearchParams();
   const router = useRouter();
   const jobId = params.get('job_id') || '';
+  const [lastJobId, setLastJobId] = useState<string | null>(null);
   const [candidates, setCandidates] = useState<CandidateRow[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedReasonsId, setSelectedReasonsId] = useState<string | null>(null);
   const [reasons, setReasons] = useState<ReasonDetail[]>([]);
+
+  // Persist current job_id for quick retesting
+  useEffect(() => {
+    if (jobId) {
+      try { localStorage.setItem('last_job_id', jobId); setLastJobId(jobId); } catch {}
+    } else {
+      try {
+        const prev = localStorage.getItem('last_job_id');
+        setLastJobId(prev);
+        if (prev) router.replace(`/search-unfolding?job_id=${prev}`);
+      } catch {}
+    }
+  }, [jobId, router]);
 
   useEffect(() => {
     let mounted = true;
@@ -149,6 +163,15 @@ export default function SearchUnfoldingPage() {
       <div className="content-inner" style={{ maxWidth: 900, margin: '0 auto' }}>
         <h1 className="header-title">Finding matches...</h1>
         <p className="header-subtitle">We are looking for nearby compliant technicians.</p>
+
+        <div style={{ display: 'flex', gap: 8, justifyContent: 'flex-end', marginBottom: 12 }}>
+          {lastJobId && (
+            <button className="outline-button" onClick={() => router.replace(`/search-unfolding?job_id=${lastJobId}`)}>
+              Use last job
+            </button>
+          )}
+          <button className="outline-button" onClick={() => { try { navigator.clipboard.writeText(window.location.href); } catch {} }}>Copy link</button>
+        </div>
 
         <div style={{ display: 'grid', gap: 16 }}>
           {loading && (
