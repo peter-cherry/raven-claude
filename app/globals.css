@@ -24,7 +24,7 @@ body {
 }
 
 .app-layout { display: flex; min-height: 100vh; }
-.sidebar { --sidebar-peek: 10px; --open-offset: 5%; width: 240px; background: transparent; border-right: none; display: flex; flex-direction: column; align-items: stretch; padding: 16px 8px; gap: 12px; position: fixed; left: 0; top: 0; bottom: 0; z-index: 200; overflow: hidden; transform: translateX(calc(-100% + var(--sidebar-peek))); transition: transform 0.25s ease; }
+.sidebar { --sidebar-peek: 10px; --open-offset: 5%; width: 240px; background: #151413; border-right: 1px solid #201939; display: flex; flex-direction: column; align-items: stretch; padding: 16px 8px; gap: 12px; position: fixed; left: 0; top: 0; bottom: 0; z-index: 200; overflow: hidden; transform: translateX(calc(-100% + var(--sidebar-peek))); transition: transform 0.25s ease; }
 /* Slide in on hover, leave a few pixels visible when collapsed */
 .sidebar.hover-expand:hover { transform: translateX(calc(-1 * var(--open-offset, 15%))); }
 /* Decorative SVG background */
@@ -36,8 +36,6 @@ body {
 .nav-item.active { color: #6A6288; background: transparent; }
 .nav-item:hover { color: #F9F3E5; background: rgba(255,255,255,0.08); }
 .nav-icon, .nav-emoji { display: grid; place-items: center; width: 20px; height: 20px; }
-.item-label { white-space: nowrap; overflow: hidden; opacity: 0; width: 0; transition: opacity 0.2s ease, width 0.2s ease; }
-.sidebar.hover-expand:hover .item-label { opacity: 1; width: auto; }
 .bottom-push { margin-top: auto; }
 
 /* Legacy icon styles kept for backwards compatibility */
@@ -146,7 +144,7 @@ body {
 .wo-error { color: var(--error, #EF4444); font-size: 12px; margin-top: 8px; }
 
 @media (max-width: 768px) {
-  .sidebar { --sidebar-peek: 8px; --open-offset: 5%; width: 240px; padding: 12px 6px; }
+  .sidebar { --sidebar-peek: 8px; --open-offset: 5%; width: 240px; padding: 12px 6px; background: #151413; border-right: 1px solid #201939; }
   .main-content { margin-left: var(--sidebar-peek, 8px); }
   .top-bar { padding: 0 16px; height: 72px; }
   .content-area { padding: 20px 16px; }
