@@ -46,6 +46,8 @@ body {
 .nav-item:hover { color: #FFFFFF; }
 .nav-item::before { display: none; }
 .nav-icon, .nav-emoji { display: grid; place-items: center; width: 20px; height: 20px; }
+.nav-item.nav-compliance .nav-icon { transform: scale(0.9); transform-origin: center; }
+.nav-item .nav-icon svg { display: block; }
 .icon-glow { opacity: 0; transition: opacity 0.2s ease; }
 .glow-fill { width: 100%; height: 100%; fill: currentColor; filter: blur(0); }
 .nav-item:hover .icon-glow { opacity: 1; }
