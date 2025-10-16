@@ -1,6 +1,6 @@
 "use client";
 
-import Link from 'next/link';
+'use client';
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { PolicyModal } from '@/components/PolicyModal';
@@ -110,7 +110,7 @@ export default function HomePage() {
         <section className="home-hero">
           <div className="search-tab-group">
             <div className="search-tab">
-            <Link href="/jobs/create" className="search-tab-hitarea" aria-label="Open create work order form"></Link>
+            <button type="button" className="search-tab-hitarea" aria-label="Open create work order form" onClick={() => router.push('/jobs/create')}></button>
             <svg viewBox="0 0 615 233.3" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false" shapeRendering="geometricPrecision">
               <rect x="1.5" y="1.5" width="612" height="230.3" rx="10" ry="10" fill="var(--bg-secondary)" stroke="var(--border-accent)" strokeWidth="3" vectorEffect="non-scaling-stroke" />
             </svg>
@@ -134,9 +134,9 @@ export default function HomePage() {
                   <path d="M28 230C27.4477 230 27 230.448 27 231H25C23.8954 231 23 231.895 23 233V248C23 249.105 23.8954 250 25 250H37C38.1046 250 39 249.105 39 248V233C39 231.895 38.1046 231 37 231H35C35 230.448 34.5523 230 34 230H28ZM35 233H37V248H25V233H27V234C27 234.552 27.4477 235 28 235H34C34.5523 235 35 234.552 35 234V233ZM29 233V232H33V233H29Z" fill="currentColor"/>
                 </svg>
               </button>
-              <Link href="/jobs/create" className="sub-action action-right" aria-label="Open create work order">
+              <button type="button" className="sub-action action-right" aria-label="Open create work order" onClick={() => router.push('/jobs/create')}>
                 <span className="sub-action-logo" aria-hidden="true"></span>
-              </Link>
+              </button>
             </div>
             </div>
           </div>
