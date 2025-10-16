@@ -28,24 +28,22 @@ body {
 /* Slide in on hover, leave a few pixels visible when collapsed */
 .sidebar.hover-expand:hover { transform: translateX(calc(-1 * var(--open-offset, 15%))); }
 /* Decorative SVG background */
-.sidebar-svg-bg { position: absolute; top: 0; bottom: 0; left: 0; width: 68px; height: 100%; pointer-events: none; user-select: none; }
+.sidebar-svg-bg { position: absolute; top: 0; bottom: 0; left: 0; width: 85px; height: 100%; pointer-events: none; user-select: none; }
 
 /* Navigation stack */
-.nav-stack { display: grid; gap: 8px; }
-.nav-item { position: relative; display: flex; align-items: center; gap: 12px; height: 40px; padding: 0 10px; color: #F9F3E5; border-radius: 8px; text-decoration: none; transition: background 0.2s, color 0.2s; }
-.nav-item.active { color: #6A6288; background: transparent; }
-.nav-item:hover { color: #F9F3E5; background: rgba(255,255,255,0.06); }
-.nav-item::before { content: ""; position: absolute; left: -6px; top: 50%; transform: translateY(-50%); width: 3px; height: 20px; border-radius: 2px; background: transparent; opacity: 0; transition: all 0.2s ease; }
-.nav-item:hover::before { background: #ffffff; opacity: 1; box-shadow: 0 0 10px rgba(255,255,255,0.6); }
-.nav-item.active::before { background: #6A6288; opacity: 1; box-shadow: 0 0 8px rgba(106,98,136,0.6); }
+.nav-stack { position: absolute; inset: 0; }
+.nav-item { position: absolute; left: 38px; display: grid; place-items: center; width: 20px; height: 20px; color: #F9F3E5; text-decoration: none; }
+.nav-item.active { color: #6A6288; }
+.nav-item:hover { color: #F9F3E5; }
+.nav-item::before { display: none; }
 .nav-icon, .nav-emoji { display: grid; place-items: center; width: 20px; height: 20px; }
 .icon-glow { opacity: 0; transition: opacity 0.2s ease; }
-.glow-fill { width: 100%; height: 100%; fill: currentColor; filter: blur(0px); }
+.glow-fill { width: 100%; height: 100%; fill: currentColor; filter: blur(0); }
 .nav-item:hover .icon-glow { opacity: 1; }
 .nav-item.active .icon-glow { opacity: 1; }
-.nav-item:hover .icon-glow .glow-fill { filter: blur(3px); }
-.nav-item.active .icon-glow .glow-fill { filter: blur(4px); }
-.bottom-push { margin-top: auto; }
+.nav-item:hover .icon-glow .glow-fill { filter: blur(1.5px); }
+.nav-item.active .icon-glow .glow-fill { filter: blur(2px); }
+.bottom-push { position: absolute; bottom: 16px; left: 38px; }
 
 /* Legacy icon styles kept for backwards compatibility */
 .sidebar-icon { width: 40px; height: 40px; display: grid; place-items: center; color: var(--text-secondary); cursor: pointer; border-radius: 8px; transition: all 0.2s; }
