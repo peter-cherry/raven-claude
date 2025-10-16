@@ -92,6 +92,10 @@ body {
 /* CTA gradient variant */
 .gradient-cta { background: linear-gradient(90deg, #6C72C9, #8083AE); }
 
+.cta-muted-link { display: inline-flex; align-items: center; justify-content: center; gap: 8px; padding: 0; background: transparent; color: var(--text-secondary); border: none; font-weight: 600; font-size: 15px; cursor: pointer; text-decoration: none; }
+.cta-muted-link:hover { color: var(--text-primary); text-decoration: underline; }
+.cta-muted-link:focus { outline: 2px solid var(--border-accent); outline-offset: 2px; }
+
 .search-container { max-width: 720px; margin: 0 auto; }
 .search-wrapper { position: relative; }
 .search-input { width: 100%; padding: 16px 48px 16px 20px; border-radius: 12px; border: 2px solid var(--border-accent); background: var(--bg-secondary); color: var(--text-primary); font-size: 16px; outline: none; transition: all 0.2s; }
