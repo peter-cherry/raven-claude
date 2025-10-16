@@ -154,9 +154,7 @@ export default function HomePage() {
         if (membership?.org_id) orgId = membership.org_id;
         if (!orgId) throw new Error('Organization not found');
         const payload = items.map((i) => ({ requirement_type: i.name, required: i.checked, weight: 1, min_valid_days: 0 }));
-        const authClient = createClientComponentClient();
-        const { data: sess } = await authClient.auth.getSession();
-        const token = sess.session?.access_token;
+        const token = session?.access_token;
         const res = await fetch('/api/policies/draft', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json', ...(token ? { Authorization: `Bearer ${token}` } : {}) },
