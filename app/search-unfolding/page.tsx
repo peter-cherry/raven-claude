@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState, useMemo } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { supabase } from '@/lib/supabaseClient';
 
@@ -29,6 +29,7 @@ export default function SearchUnfoldingPage() {
   const jobId = params.get('job_id') || '';
   const [lastJobId, setLastJobId] = useState<string | null>(null);
   const [candidates, setCandidates] = useState<CandidateRow[]>([]);
+  const [job, setJob] = useState<{ address_text: string | null; city: string | null; state: string | null; lat: number | null; lng: number | null } | null>(null);
   const [loading, setLoading] = useState(true);
   const [selectedReasonsId, setSelectedReasonsId] = useState<string | null>(null);
   const [reasons, setReasons] = useState<ReasonDetail[]>([]);
@@ -61,6 +62,12 @@ export default function SearchUnfoldingPage() {
       return () => clearTimeout(timer);
     }
   }, [showPreviewCard]);
+
+  // Load job for map/address
+  useEffect(() => {
+    if (!jobId) return;
+    supabase.from('jobs').select('address_text, city, state, lat, lng').eq('id', jobId).single().then(({ data }) => setJob(data as any));
+  }, [jobId]);
 
   useEffect(() => {
     let mounted = true;
@@ -201,9 +208,27 @@ export default function SearchUnfoldingPage() {
         {/* Slide-in centered preview card */}
         {showPreviewCard && (
           <div ref={previewRef} className="slide-in-center-card">
-            <div className="slide-in-center-inner">
-              <div className="slide-in-title">Preview Card</div>
-              <div className="slide-in-sub">Center-aligned; slides in like the WO form.</div>
+            <div className="slide-in-center-inner" style={{ width: '100%', padding: 24, display: 'grid', gap: 16 }}>
+              {/* Google Static Maps preview */}
+              <div className="map-preview">
+                {job?.lat != null && job?.lng != null ? (
+                  <img
+                    alt="Work order location"
+                    src={`https://maps.googleapis.com/maps/api/staticmap?center=${job.lat},${job.lng}&zoom=15&size=640x320&scale=2&maptype=roadmap&markers=color:0x8B5CF6|${job.lat},${job.lng}&key=${process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY}`}
+                  />
+                ) : (
+                  <div className="map-fallback">Map preview</div>
+                )}
+              </div>
+
+              {/* Address below map */}
+              <div className="wo-address-line">
+                <span className="addr-text">{job?.address_text || 'Address not available'}</span>
+                {job?.city || job?.state ? (
+                  <span className="addr-city">{[job?.city, job?.state].filter(Boolean).join(', ')}</span>
+                ) : null}
+              </div>
+
               {previewMetrics && (
                 <div className="slide-in-metrics">x: {previewMetrics.x}px, y: {previewMetrics.y}px, w: {previewMetrics.w}px, h: {previewMetrics.h}px</div>
               )}
