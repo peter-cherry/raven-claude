@@ -20,10 +20,11 @@ export async function POST(req: Request) {
     let userId: string | null = null;
 
     if (authHeader && authHeader.startsWith('Bearer ')) {
+      const token = authHeader.replace(/^Bearer\s+/i, '');
       const url = process.env.NEXT_PUBLIC_SUPABASE_URL as string;
       const anon = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY as string;
-      supabase = createClient(url, anon, { global: { headers: { Authorization: authHeader } } });
-      const { data: userRes } = await supabase.auth.getUser();
+      supabase = createClient(url, anon, { global: { headers: { Authorization: `Bearer ${token}` } } });
+      const { data: userRes } = await supabase.auth.getUser(token);
       userId = userRes?.user?.id ?? null;
     } else {
       supabase = createRouteHandlerClient({ cookies });
