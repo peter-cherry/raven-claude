@@ -1,6 +1,7 @@
 import './globals.css';
 import type { Metadata } from 'next';
 import { Sidebar } from '@/components/Sidebar';
+import { HeaderElements } from '@/components/HeaderElements';
 import { AuthProvider } from '@/components/AuthProvider';
 
 export const metadata: Metadata = {
@@ -16,6 +17,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           <div className="app-layout">
             <Sidebar />
             <div className="main-content">
+              <HeaderElements />
               {children}
             </div>
           </div>
