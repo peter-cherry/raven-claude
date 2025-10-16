@@ -85,7 +85,6 @@ export function Sidebar() {
             title={label}
           >
             <span className="nav-icon" aria-hidden><Icon /></span>
-            <span className="item-label">{label}</span>
           </Link>
         ))}
       </nav>
@@ -93,7 +92,6 @@ export function Sidebar() {
       <div className="bottom-push">
         <Link href="/settings" className="nav-item" aria-label="Settings" title="Settings">
           <span className="nav-icon" aria-hidden><IconSettings /></span>
-          <span className="item-label">Settings</span>
         </Link>
       </div>
     </aside>
