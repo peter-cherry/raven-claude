@@ -43,7 +43,7 @@ body {
 .nav-item.nav-tech { top: 287px; }
 .nav-item.nav-jobs { top: 354px; }
 .nav-item.active { color: #6A6288; }
-.nav-item:hover { color: #F9F3E5; }
+.nav-item:hover { color: #FFFFFF; }
 .nav-item::before { display: none; }
 .nav-icon, .nav-emoji { display: grid; place-items: center; width: 20px; height: 20px; }
 .icon-glow { opacity: 0; transition: opacity 0.2s ease; }
