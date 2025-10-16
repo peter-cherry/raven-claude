@@ -292,7 +292,7 @@ export default function SearchUnfoldingPage() {
             </div>
           )}
 
-          {candidates.map((c) => {
+          {false && candidates.map((c) => {
             const complianceScore = getComplianceScore(c.technicians);
             const coiLight = getComplianceLight(c.technicians?.coi_state);
             const licenseLight = getLicenseLight(c.technicians?.verification_status);
