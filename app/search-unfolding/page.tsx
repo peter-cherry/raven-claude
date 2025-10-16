@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { supabase } from '@/lib/supabaseClient';
 
@@ -33,6 +33,11 @@ export default function SearchUnfoldingPage() {
   const [selectedReasonsId, setSelectedReasonsId] = useState<string | null>(null);
   const [reasons, setReasons] = useState<ReasonDetail[]>([]);
 
+  // Preview card that slides in and reports pixel metrics
+  const [showPreviewCard, setShowPreviewCard] = useState(true);
+  const previewRef = useRef<HTMLDivElement | null>(null);
+  const [previewMetrics, setPreviewMetrics] = useState<{ x: number; y: number; w: number; h: number } | null>(null);
+
   // Persist current job_id for quick retesting
   useEffect(() => {
     if (jobId) {
@@ -45,6 +50,17 @@ export default function SearchUnfoldingPage() {
       } catch {}
     }
   }, [jobId, router]);
+
+  useEffect(() => {
+    // measure preview card after it animates in
+    if (showPreviewCard) {
+      const timer = setTimeout(() => {
+        const r = previewRef.current?.getBoundingClientRect();
+        if (r) setPreviewMetrics({ x: Math.round(r.left), y: Math.round(r.top), w: Math.round(r.width), h: Math.round(r.height) });
+      }, 420);
+      return () => clearTimeout(timer);
+    }
+  }, [showPreviewCard]);
 
   useEffect(() => {
     let mounted = true;
@@ -172,6 +188,28 @@ export default function SearchUnfoldingPage() {
           )}
           <button className="outline-button" onClick={() => { try { navigator.clipboard.writeText(window.location.href); } catch {} }}>Copy link</button>
         </div>
+
+        {/* Controls for testing */}
+        <div style={{ display: 'flex', gap: 8, justifyContent: 'flex-end', marginBottom: 12 }}>
+          {lastJobId && (
+            <button className="outline-button" onClick={() => router.replace(`/search-unfolding?job_id=${lastJobId}`)}>Use last job</button>
+          )}
+          <button className="outline-button" onClick={() => setShowPreviewCard((v) => !v)}>{showPreviewCard ? 'Hide preview card' : 'Show preview card'}</button>
+          <button className="outline-button" onClick={() => { try { navigator.clipboard.writeText(window.location.href); } catch {} }}>Copy link</button>
+        </div>
+
+        {/* Slide-in centered preview card */}
+        {showPreviewCard && (
+          <div ref={previewRef} className="slide-in-center-card">
+            <div className="slide-in-center-inner">
+              <div className="slide-in-title">Preview Card</div>
+              <div className="slide-in-sub">Center-aligned; slides in like the WO form.</div>
+              {previewMetrics && (
+                <div className="slide-in-metrics">x: {previewMetrics.x}px, y: {previewMetrics.y}px, w: {previewMetrics.w}px, h: {previewMetrics.h}px</div>
+              )}
+            </div>
+          </div>
+        )}
 
         <div style={{ display: 'grid', gap: 16 }}>
           {loading && (
