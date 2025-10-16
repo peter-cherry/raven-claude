@@ -33,6 +33,11 @@ body {
 /* Navigation stack */
 .nav-stack { position: absolute; inset: 0; }
 .nav-item { position: absolute; left: 38px; display: grid; place-items: center; width: 20px; height: 20px; color: #F9F3E5; text-decoration: none; }
+/* Align to SVG embed positions */
+.nav-item.nav-home { top: 170px; }
+.nav-item.nav-compliance { top: 234px; }
+.nav-item.nav-tech { top: 287px; }
+.nav-item.nav-jobs { top: 354px; }
 .nav-item.active { color: #6A6288; }
 .nav-item:hover { color: #F9F3E5; }
 .nav-item::before { display: none; }
