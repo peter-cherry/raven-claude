@@ -10,7 +10,7 @@ export type PolicyItemInput = {
 export async function ensureRequirement(orgId: string, requirement_type: string, weight = 0, min_valid_days = 0) {
   const { data, error } = await supabase
     .from('compliance_requirements')
-    .upsert({ org_id: orgId, requirement_type, weight, min_valid_days, enforcement: 'ENABLED' }, { onConflict: 'org_id,requirement_type' })
+    .upsert({ org_id: orgId, requirement_type, weight, min_valid_days, enforcement: 'WARNING' }, { onConflict: 'org_id,requirement_type' })
     .select('*')
     .single();
   if (error) throw error;
