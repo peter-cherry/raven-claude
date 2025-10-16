@@ -32,7 +32,11 @@ body {
 
 /* Navigation stack */
 .nav-stack { position: absolute; top: 0; bottom: 64px; left: 0; width: 85px; }
-.nav-item { position: static; display: grid; place-items: center; width: 20px; height: 20px; color: #F9F3E5; text-decoration: none; }
+.nav-item { position: absolute; left: 38px; display: grid; place-items: center; width: 20px; height: 20px; color: #F9F3E5; text-decoration: none; }
+.nav-item.nav-home { top: 170px; }
+.nav-item.nav-jobs { top: calc(170px + 85px * 1); }
+.nav-item.nav-tech { top: calc(170px + 85px * 2); }
+.nav-item.nav-compliance { top: calc(170px + 85px * 3); }
 /* Align to SVG embed positions */
 .nav-item.nav-home { top: 170px; }
 .nav-item.nav-compliance { top: 234px; }
