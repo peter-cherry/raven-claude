@@ -123,7 +123,7 @@ export default function HomePage() {
                 <path d="M0.5 0.5H610.49V49.3A9.5 9.5 0 0 1 600.99 58.8H10A9.5 9.5 0 0 1 0.5 49.3V0.5Z" fill="#2A2B39" stroke="#6C72C9" strokeWidth="1" vectorEffect="non-scaling-stroke" shapeRendering="geometricPrecision" />
               </svg>
               <div className="sub-search-content">
-              <Link href="/jobs/create" className="sub-action action-left" aria-label="New work order">
+              <Link href="/compliance#frame-6" className="sub-action action-left" aria-label="Open compliance">
                 <svg width="20" height="20" viewBox="20 228 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
                   <path d="M28 239.5C28.5523 239.5 29 239.052 29 238.5C29 237.948 28.5523 237.5 28 237.5C27.4477 237.5 27 237.948 27 238.5C27 239.052 27.4477 239.5 28 239.5Z" fill="currentColor"/>
                   <path d="M30 238.5C30 237.948 30.4477 237.5 31 237.5H34C34.5523 237.5 35 237.948 35 238.5C35 239.052 34.5523 239.5 34 239.5H31C30.4477 239.5 30 239.052 30 238.5Z" fill="currentColor"/>
