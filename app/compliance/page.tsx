@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from 'react';
+import { createDraftPolicy } from '@/lib/compliance';
 
 const mockData = [
   { id: 1, name: 'Armando Diego Maradona', state: 'CA', compliance: 'Full', city: 'Los Angeles', score: 7.5, status: 'active' },
@@ -12,6 +13,10 @@ const mockData = [
 
 export default function CompliancePage() {
   const [searchQuery, setSearchQuery] = useState('');
+  const [coiRequired, setCoiRequired] = useState(true);
+  const [licenseRequired, setLicenseRequired] = useState(true);
+  const [saving, setSaving] = useState(false);
+  const orgId = process.env.NEXT_PUBLIC_DEFAULT_ORG_ID as string;
 
   const getScoreClass = (score: number) => {
     if (score >= 7) return 'high';
@@ -29,6 +34,36 @@ export default function CompliancePage() {
           <p className="header-subtitle">Monitor technician compliance status</p>
 
           <section id="frame-6" className="section-spacer" />
+
+          <div className="container-card" style={{ display: 'grid', gap: 12 }}>
+            <div style={{ display: 'flex', gap: 16, alignItems: 'center', flexWrap: 'wrap' }}>
+              <label style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+                <input type="checkbox" checked={coiRequired} onChange={(e) => setCoiRequired(e.target.checked)} />
+                Require valid COI
+              </label>
+              <label style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+                <input type="checkbox" checked={licenseRequired} onChange={(e) => setLicenseRequired(e.target.checked)} />
+                License must match job state
+              </label>
+              <button
+                disabled={saving}
+                className="primary-button"
+                onClick={async () => {
+                  try {
+                    setSaving(true);
+                    const items = [
+                      coiRequired && { requirement_type: 'COI_VALID', required: true, weight: 50, min_valid_days: 0 },
+                      licenseRequired && { requirement_type: 'LICENSE_STATE', required: true, weight: 50, min_valid_days: 0 },
+                    ].filter(Boolean) as any[];
+                    const policyId = await createDraftPolicy(orgId, items);
+                    window.location.href = `/jobs/create?policy_id=${policyId}`;
+                  } finally {
+                    setSaving(false);
+                  }
+                }}
+              >Use in Work Order</button>
+            </div>
+          </div>
 
           <div className="search-wrapper search-spacer">
             <input
