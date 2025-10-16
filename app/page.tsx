@@ -106,6 +106,18 @@ export default function HomePage() {
 
   return (
     <main className="content-area">
+      {/* Decorative search tabs */}
+      <svg className="search-tab-shape" viewBox="0 0 615 174" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false">
+        <rect x="0" y="0" width="615" height="174" rx="10" ry="10" fill="var(--bg-secondary)" stroke="var(--border-accent)" strokeWidth="2" />
+      </svg>
+      <svg className="sub-search-tab-shape" viewBox="0 0 610.99 59.3" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false">
+        <defs>
+          <clipPath id="sub-clip">
+            <path d="M0 0H610.99V49.3C610.99 54.8229 606.513 59.3 600.99 59.3H10C4.47715 59.3 0 54.8229 0 49.3V0Z" />
+          </clipPath>
+        </defs>
+        <rect x="0" y="0" width="610.99" height="59.3" rx="0" ry="0" fill="var(--bg-secondary)" stroke="var(--border-accent)" strokeWidth="2" clipPath="url(#sub-clip)" />
+      </svg>
       <div className="content-inner center-viewport">
         <section className="home-hero">
           <div className="wo-panel">
