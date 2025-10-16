@@ -112,7 +112,7 @@ export default function HomePage() {
             <div className="search-tab">
             <Link href="/jobs/create" className="search-tab-hitarea" aria-label="Open create work order form"></Link>
             <svg viewBox="0 0 615 174" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false">
-              <rect x="0" y="0" width="615" height="174" rx="10" ry="10" fill="var(--bg-secondary)" stroke="var(--border-accent)" strokeWidth="2" />
+              <rect x="0" y="0" width="615" height="174" rx="10" ry="10" fill="var(--bg-secondary)" stroke="var(--border-accent)" strokeWidth="3" />
             </svg>
             <div className="search-tab-content">
               <h2 className="wo-title">Create a WO  +</h2>
