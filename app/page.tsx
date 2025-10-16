@@ -153,12 +153,20 @@ export default function HomePage() {
         const { data: membership } = await supabase.from('org_memberships').select('org_id').eq('user_id', user.id).single();
         if (membership?.org_id) orgId = membership.org_id;
         if (!orgId) throw new Error('Organization not found');
-        const payload = items.map((i) => ({ requirement_type: i.name, required: i.checked, weight: 1, min_valid_days: 0 }));
+        const seen = new Set<string>();
+        const uniqueItems: Array<{ requirement_type: string; required: boolean; weight: number; min_valid_days: number }> = [];
+        for (const it of items) {
+          const key = it.name.trim().toUpperCase();
+          if (!seen.has(key)) {
+            seen.add(key);
+            uniqueItems.push({ requirement_type: it.name, required: it.checked, weight: 1, min_valid_days: 0 });
+          }
+        }
         const token = session?.access_token;
         const res = await fetch('/api/policies/draft', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json', ...(token ? { Authorization: `Bearer ${token}` } : {}) },
-          body: JSON.stringify({ org_id: orgId, items: payload }),
+          body: JSON.stringify({ org_id: orgId, items: uniqueItems }),
           credentials: 'same-origin',
         });
         const j = await res.json().catch(()=>({}));
