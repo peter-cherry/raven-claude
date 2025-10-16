@@ -31,7 +31,7 @@ body {
 .sidebar-svg-bg { position: absolute; top: 0; bottom: 0; left: 0; width: 85px; height: 100%; pointer-events: none; user-select: none; }
 
 /* Navigation stack */
-.nav-stack { position: absolute; top: 0; bottom: 0; left: 0; width: 85px; display: grid; grid-auto-flow: row; align-content: space-evenly; justify-items: center; padding: 12px 0; }
+.nav-stack { position: absolute; top: 0; bottom: 64px; left: 0; width: 85px; display: flex; flex-direction: column; justify-content: space-evenly; align-items: center; padding: 12px 0; }
 .nav-item { position: static; display: grid; place-items: center; width: 20px; height: 20px; color: #F9F3E5; text-decoration: none; }
 /* Align to SVG embed positions */
 .nav-item.nav-home { top: 170px; }
