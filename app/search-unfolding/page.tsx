@@ -188,26 +188,8 @@ export default function SearchUnfoldingPage() {
   return (
     <main className="content-area">
       <div className="content-inner" style={{ maxWidth: 900, margin: '0 auto' }}>
-        <h1 className="header-title">Finding matches...</h1>
-        <p className="header-subtitle">We are looking for nearby compliant technicians.</p>
-
-        <div style={{ display: 'flex', gap: 8, justifyContent: 'flex-end', marginBottom: 12 }}>
-          {lastJobId && (
-            <button className="outline-button" onClick={() => router.replace(`/search-unfolding?job_id=${lastJobId}`)}>
-              Use last job
-            </button>
-          )}
-          <button className="outline-button" onClick={() => { try { navigator.clipboard.writeText(window.location.href); } catch {} }}>Copy link</button>
-        </div>
-
-        {/* Controls for testing */}
-        <div style={{ display: 'flex', gap: 8, justifyContent: 'flex-end', marginBottom: 12 }}>
-          {lastJobId && (
-            <button className="outline-button" onClick={() => router.replace(`/search-unfolding?job_id=${lastJobId}`)}>Use last job</button>
-          )}
-          <button className="outline-button" onClick={() => setShowPreviewCard((v) => !v)}>{showPreviewCard ? 'Hide preview card' : 'Show preview card'}</button>
-          <button className="outline-button" onClick={() => { try { navigator.clipboard.writeText(window.location.href); } catch {} }}>Copy link</button>
-        </div>
+        <h1 className="header-title" style={{ display: 'none' }}>Finding matches...</h1>
+        <p className="header-subtitle" style={{ display: 'none' }}>We are looking for nearby compliant technicians.</p>
 
         {/* Slide-in centered preview card */}
         {showPreviewCard && (
@@ -223,15 +205,18 @@ export default function SearchUnfoldingPage() {
                 ) : (
                   <div className="map-fallback">Map preview</div>
                 )}
+                {/* Address overlay inside map, bottom-right with 5px offset */}
+                <div className="wo-address-line">
+                  <span className="addr-text">{job?.address_text || 'Address not available'}</span>
+                  {job?.city || job?.state ? (
+                    <span className="addr-city">{[job?.city, job?.state].filter(Boolean).join(', ')}</span>
+                  ) : null}
+                </div>
               </div>
 
-              {/* Address below map */}
-              <div className="wo-address-line">
-                <span className="addr-text">{job?.address_text || 'Address not available'}</span>
-                {job?.city || job?.state ? (
-                  <span className="addr-city">{[job?.city, job?.state].filter(Boolean).join(', ')}</span>
-                ) : null}
-              </div>
+              {/* Heading below map, 10px offset */}
+              <h1 className="header-title" style={{ margin: '10px 10px 0' }}>Finding matches...</h1>
+              <p className="header-subtitle" style={{ margin: '0 10px' }}>We are looking for nearby compliant technicians.</p>
 
               {/* Strips appear from behind mask 52px below map */}
               <div className="reveal-stage">
