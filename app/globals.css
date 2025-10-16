@@ -73,7 +73,7 @@ body {
 .search-tab { position: relative; width: 615px; height: 233.3px; margin: 0 auto; display: grid; align-items: center; z-index: 1; }
 .search-tab > svg { position: absolute; inset: 0; width: 100%; height: 100%; }
 .search-tab-content { position: relative; z-index: 1; padding: 16px 24px; }
-.search-tab-hitarea { position: absolute; top: 0; left: 0; right: 0; bottom: 59.3px; z-index: 1; display: block; cursor: pointer; }
+.search-tab-hitarea { position: absolute; top: 0; left: 0; right: 0; bottom: 59.3px; z-index: 1; display: block; cursor: pointer; background: transparent; border: none; padding: 0; }
 
 .sub-search-tab { position: absolute; top: 171px; left: 50%; transform: translateX(-50%); width: 619px; height: 59.3px; margin: 0; display: grid; align-items: center; z-index: 2; }
 .sub-search-tab > svg { position: absolute; inset: 0; width: 100%; height: 100%; }
