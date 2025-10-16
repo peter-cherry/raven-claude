@@ -123,7 +123,7 @@ export default function HomePage() {
                 <path d="M0.5 0.5H610.49V49.3A9.5 9.5 0 0 1 600.99 58.8H10A9.5 9.5 0 0 1 0.5 49.3V0.5Z" fill="#2A2B39" stroke="#6C72C9" strokeWidth="1" vectorEffect="non-scaling-stroke" shapeRendering="geometricPrecision" />
               </svg>
               <div className="sub-search-content">
-              <Link href="/compliance#frame-6" className="sub-action action-left" aria-label="Open compliance">
+              <button type="button" className="sub-action action-left" aria-label="Open policy overlay" onClick={() => setShowPolicyModal(true)}>
                 <svg width="20" height="20" viewBox="20 228 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
                   <path d="M28 239.5C28.5523 239.5 29 239.052 29 238.5C29 237.948 28.5523 237.5 28 237.5C27.4477 237.5 27 237.948 27 238.5C27 239.052 27.4477 239.5 28 239.5Z" fill="currentColor"/>
                   <path d="M30 238.5C30 237.948 30.4477 237.5 31 237.5H34C34.5523 237.5 35 237.948 35 238.5C35 239.052 34.5523 239.5 34 239.5H31C30.4477 239.5 30 239.052 30 238.5Z" fill="currentColor"/>
@@ -133,7 +133,7 @@ export default function HomePage() {
                   <path d="M28 245.5C28.5523 245.5 29 245.052 29 244.5C29 243.948 28.5523 243.5 28 243.5C27.4477 243.5 27 243.948 27 244.5C27 245.052 27.4477 245.5 28 245.5Z" fill="currentColor"/>
                   <path d="M28 230C27.4477 230 27 230.448 27 231H25C23.8954 231 23 231.895 23 233V248C23 249.105 23.8954 250 25 250H37C38.1046 250 39 249.105 39 248V233C39 231.895 38.1046 231 37 231H35C35 230.448 34.5523 230 34 230H28ZM35 233H37V248H25V233H27V234C27 234.552 27.4477 235 28 235H34C34.5523 235 35 234.552 35 234V233ZM29 233V232H33V233H29Z" fill="currentColor"/>
                 </svg>
-              </Link>
+              </button>
               <Link href="/jobs/create" className="sub-action action-right" aria-label="Open create work order">
                 <span className="sub-action-logo" aria-hidden="true"></span>
               </Link>
