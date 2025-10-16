@@ -234,6 +234,13 @@ export default function CreateJobPage() {
             return;
           }
 
+          const policyId = params.get('policy_id');
+          if (policyId) {
+            try {
+              await supabase.from('compliance_policies').update({ job_id: job.id }).eq('id', policyId);
+            } catch {}
+          }
+
           await supabase.rpc('find_matching_technicians', {
             p_job_id: job.id,
             p_lat: geo.lat,
