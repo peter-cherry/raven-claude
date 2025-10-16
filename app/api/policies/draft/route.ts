@@ -50,7 +50,7 @@ export async function POST(req: Request) {
     for (const it of items) {
       const { data: reqRow, error: rErr } = await supabase
         .from('compliance_requirements')
-        .upsert({ org_id, requirement_type: it.requirement_type, weight: it.weight ?? 0, min_valid_days: it.min_valid_days ?? 0, enforcement: 'ENABLED' }, { onConflict: 'org_id,requirement_type' })
+        .upsert({ org_id, requirement_type: it.requirement_type, weight: it.weight ?? 0, min_valid_days: it.min_valid_days ?? 0, enforcement: 'WARNING' }, { onConflict: 'org_id,requirement_type' })
         .select('id')
         .single();
       if (rErr) throw rErr;
