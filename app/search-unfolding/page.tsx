@@ -212,7 +212,7 @@ export default function SearchUnfoldingPage() {
         {/* Slide-in centered preview card */}
         {showPreviewCard && (
           <div ref={previewRef} className="slide-in-center-card">
-            <div className="slide-in-center-inner" style={{ width: '100%', padding: 24, display: 'grid', gap: 16 }}>
+            <div className="slide-in-center-inner" style={{ width: '100%', padding: 0, display: 'grid', gap: 16 }}>
               {/* Google Static Maps preview */}
               <div className="map-preview">
                 {job?.lat != null && job?.lng != null ? (
