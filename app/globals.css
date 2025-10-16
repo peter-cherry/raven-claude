@@ -31,8 +31,8 @@ body {
 .sidebar-svg-bg { position: absolute; top: 0; bottom: 0; left: 0; width: 85px; height: 100%; pointer-events: none; user-select: none; }
 
 /* Navigation stack */
-.nav-stack { position: absolute; inset: 0; }
-.nav-item { position: absolute; left: 38px; display: grid; place-items: center; width: 20px; height: 20px; color: #F9F3E5; text-decoration: none; }
+.nav-stack { position: absolute; top: 0; bottom: 0; left: 0; width: 85px; display: grid; grid-auto-flow: row; align-content: space-evenly; justify-items: center; padding: 12px 0; }
+.nav-item { position: static; display: grid; place-items: center; width: 20px; height: 20px; color: #F9F3E5; text-decoration: none; }
 /* Align to SVG embed positions */
 .nav-item.nav-home { top: 170px; }
 .nav-item.nav-compliance { top: 234px; }
@@ -48,7 +48,7 @@ body {
 .nav-item.active .icon-glow { opacity: 1; }
 .nav-item:hover .icon-glow .glow-fill { filter: blur(1.5px); }
 .nav-item.active .icon-glow .glow-fill { filter: blur(2px); }
-.bottom-push { position: absolute; bottom: 16px; left: 38px; }
+.bottom-push { position: absolute; bottom: 16px; left: 0; width: 85px; display: grid; place-items: center; }
 
 /* Legacy icon styles kept for backwards compatibility */
 .sidebar-icon { width: 40px; height: 40px; display: grid; place-items: center; color: var(--text-secondary); cursor: pointer; border-radius: 8px; transition: all 0.2s; }
