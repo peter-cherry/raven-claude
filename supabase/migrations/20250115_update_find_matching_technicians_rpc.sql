@@ -17,7 +17,7 @@ BEGIN
   SELECT trade_needed, org_id INTO v_job_trade, v_org_id
   FROM jobs
   WHERE id = p_job_id;
-  
+
   IF NOT FOUND THEN
     RETURN;
   END IF;
@@ -34,10 +34,10 @@ BEGIN
     -- Use placeholder distance/duration
     v_distance_m := (random() * 50000)::NUMERIC;
     v_duration_sec := (v_distance_m / 1000 * 3)::NUMERIC;
-    
-    -- Insert into job_candidates
-    INSERT INTO job_candidates (job_id, technician_id, distance_m, duration_sec, match_score)
-    VALUES (p_job_id, v_technician_id, v_distance_m, v_duration_sec, 0.8)
+
+    -- Insert into job_candidates with org_id
+    INSERT INTO job_candidates (org_id, job_id, technician_id, distance_m, duration_sec, match_score)
+    VALUES (v_org_id, p_job_id, v_technician_id, v_distance_m, v_duration_sec, 0.8)
     ON CONFLICT DO NOTHING;
   END LOOP;
 END
