@@ -194,7 +194,7 @@ body {
 .wo-error { color: var(--error, #EF4444); font-size: 12px; margin-top: 8px; }
 
 /* Slide-in center card */
-.slide-in-center-card { position: fixed; left: 50%; top: 50%; transform: translate(-50%, -60%); width: 889px; height: 950px; max-width: 92vw; max-height: calc(100vh - 120px); overflow: auto; background: var(--bg-secondary); border: 2px solid var(--border-accent); border-radius: 12px; box-shadow: var(--shadow-md, 0 4px 12px rgba(0,0,0,0.35)); z-index: 999; animation: slideInUp .35s ease forwards; } @media (max-width: 1024px) { .slide-in-center-card { width: min(889px, 92vw); height: min(950px, calc(100vh - 120px)); } }
+.slide-in-center-card { position: fixed; left: 50%; top: 50%; transform: translateX(-50%); width: 889px; height: 950px; max-width: 92vw; max-height: calc(100vh - 120px); overflow: auto; background: var(--bg-secondary); border: 2px solid var(--border-accent); border-radius: 12px; box-shadow: var(--shadow-md, 0 4px 12px rgba(0,0,0,0.35)); z-index: 999; animation: slideInFromBottom .45s ease forwards; } @media (max-width: 1024px) { .slide-in-center-card { width: min(889px, 92vw); height: min(950px, calc(100vh - 120px)); } }
 .slide-in-center-inner { height: 100%; display: grid; place-items: center; text-align: center; padding: 16px; }
 .slide-in-title { font-weight: 700; font-size: 18px; color: var(--text-primary); }
 .slide-in-sub { font-size: 14px; color: var(--text-secondary); }
