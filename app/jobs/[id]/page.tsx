@@ -32,6 +32,7 @@ export default function JobDetailPage() {
   const [candidates, setCandidates] = useState<CandidateRow[]>([]);
   const [scores, setScores] = useState<any[] | null>(null);
   const [techMap, setTechMap] = useState<Record<string, { id: string; full_name: string | null; city: string | null; state: string | null }>>({});
+  const [reasonsFor, setReasonsFor] = useState<any | null>(null);
   const pathname = usePathname();
   const params = useSearchParams();
   const jobId = pathname?.split('/').pop() || '';
@@ -100,17 +101,27 @@ export default function JobDetailPage() {
             <div style={{ display: 'grid', gap: 8 }}>
               {scores.slice(0,5).map((s: any, idx: number) => {
                 const t = techMap[s.technician_id];
+                const passed = (type: string) => (s.passed_requirements ?? []).some((r: any) => (r.type ?? r.type)?.toString() === type || (r.type ?? r.type) === type);
+                const coiPass = passed('COI_VALID');
+                const licPass = passed('LICENSE_STATE');
+                const cand = (candidates || []).find((c) => c.technicians?.id === s.technician_id);
+                const dist = cand?.distance_m != null ? `${(cand.distance_m/1000).toFixed(0)}Km Away` : '';
                 return (
-                  <div key={s.technician_id} className="container-card" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '8px 10px' }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                  <div key={s.technician_id} className="container-card" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '8px 12px', gap: 12 }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 10, minWidth: 0 }}>
                       <span style={{ width: 18, textAlign: 'right', fontWeight: 700 }}>{idx+1}</span>
-                      <div>
-                        <div style={{ fontWeight: 600 }}>{t?.full_name ?? s.technician_id.slice(0,8)}</div>
-                        <div style={{ color: 'var(--text-secondary)', fontSize: 12 }}>{t?.city ?? ''} {t?.state ?? ''}</div>
+                      <div style={{ minWidth: 0 }}>
+                        <div style={{ fontWeight: 600, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{t?.full_name ?? s.technician_id.slice(0,8)}</div>
+                        <div style={{ color: 'var(--text-secondary)', fontSize: 12 }}>{dist}</div>
                       </div>
                     </div>
-                    <span className={`score-badge ${s.score >= 80 ? 'high' : s.score >= 60 ? 'medium' : 'low'}`}>{s.score}</span>
-                    <button className="primary-button" onClick={() => assign(s.technician_id)}>Assign</button>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                      <span className={`mini-dot ${coiPass ? 'dot-green' : 'dot-amber'}`} title="COI valid" />
+                      <span className={`mini-dot ${licPass ? 'dot-green' : 'dot-amber'}`} title="License by state" />
+                      <span className={`score-badge ${s.score >= 80 ? 'high' : s.score >= 60 ? 'medium' : 'low'}`}>{s.score}</span>
+                      <button className="outline-button" onClick={() => setReasonsFor(s)}>See Reasons</button>
+                      <button className="primary-button" onClick={() => assign(s.technician_id)}>Assign</button>
+                    </div>
                   </div>
                 );
               })}
@@ -133,6 +144,28 @@ export default function JobDetailPage() {
             </div>
           ))}
         </div>
+        {reasonsFor && (
+          <div className="policy-modal-overlay" onClick={() => setReasonsFor(null)}>
+            <div className="policy-modal-card" onClick={(e) => e.stopPropagation()}>
+              <div className="policy-list">
+                <div className="header-title" style={{ fontSize: 18 }}>Reasons for {techMap[reasonsFor.technician_id]?.full_name ?? reasonsFor.technician_id.slice(0,8)}</div>
+                <div>
+                  <div style={{ fontWeight: 700, marginTop: 8 }}>Passed</div>
+                  <ul>
+                    {(reasonsFor.passed_requirements ?? []).map((r: any, i: number) => (<li key={i}>{r.type}</li>))}
+                  </ul>
+                  <div style={{ fontWeight: 700, marginTop: 8 }}>Failed</div>
+                  <ul>
+                    {(reasonsFor.failed_requirements ?? []).map((r: any, i: number) => (<li key={i}>{r.type}</li>))}
+                  </ul>
+                </div>
+                <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
+                  <button className="outline-button" onClick={() => setReasonsFor(null)}>Close</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     </main>
   );
