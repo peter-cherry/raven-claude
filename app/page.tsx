@@ -120,7 +120,7 @@ export default function HomePage() {
           </div>
             <div className="sub-search-tab">
               <svg viewBox="0 0 610.99 59.3" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false">
-                <path d="M0 0H610.99V49.3A10 10 0 0 1 600.99 59.3H10A10 10 0 0 1 0 49.3V0Z" fill="#2A2B39" stroke="var(--border-accent)" strokeWidth="1" />
+                <path d="M0.5 0.5H610.49V49.3A9.5 9.5 0 0 1 600.99 58.8H10A9.5 9.5 0 0 1 0.5 49.3V0.5Z" fill="#2A2B39" stroke="#6C72C9" strokeWidth="1" vectorEffect="non-scaling-stroke" shapeRendering="geometricPrecision" />
               </svg>
               <div className="sub-search-content">
               <Link href="/jobs/create" className="sub-action action-left" aria-label="New work order">
