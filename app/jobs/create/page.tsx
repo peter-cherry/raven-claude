@@ -1,5 +1,7 @@
 "use client";
 
+'use client';
+
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useEffect, useMemo, useState } from 'react';
 import { z } from 'zod';
