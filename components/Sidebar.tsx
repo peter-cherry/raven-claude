@@ -3,12 +3,53 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 
+function IconSearch() {
+  return (
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <circle cx="11" cy="11" r="7" stroke="currentColor" strokeWidth="2"/>
+      <line x1="16.5" y1="16.5" x2="21" y2="21" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
+    </svg>
+  );
+}
+function IconList() {
+  return (
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <rect x="5" y="6" width="14" height="2" fill="currentColor"/>
+      <rect x="5" y="11" width="14" height="2" fill="currentColor"/>
+      <rect x="5" y="16" width="14" height="2" fill="currentColor"/>
+    </svg>
+  );
+}
+function IconAvatar() {
+  return (
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <circle cx="12" cy="8" r="4" fill="currentColor"/>
+      <path d="M4 20c0-4.418 3.582-8 8-8s8 3.582 8 8" fill="currentColor"/>
+    </svg>
+  );
+}
+function IconCopy() {
+  return (
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <rect x="9" y="9" width="10" height="12" rx="2" stroke="currentColor" strokeWidth="2"/>
+      <rect x="5" y="3" width="10" height="12" rx="2" stroke="currentColor" strokeWidth="2"/>
+    </svg>
+  );
+}
+function IconSettings() {
+  return (
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M12 15.5a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7Z" stroke="currentColor" strokeWidth="2"/>
+      <path d="M19.4 15a1 1 0 0 0 .2 1.1l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1 1 0 0 0-1.1-.2 1 1 0 0 0-.6.9V20a2 2 0 1 1-4 0v-.1a1 1 0 0 0-.7-.9 1 1 0 0 0-1.1.2l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1 1 0 0 0 .2-1.1 1 1 0 0 0-.9-.6H4a2 2 0 1 1 0-4h.1a1 1 0 0 0 .9-.7 1 1 0 0 0-.2-1.1l-.1-.1A2 2 0 1 1 7.5 4.7l.1.1a1 1 0 0 0 1.1.2h.1a1 1 0 0 0 .6-.9V4a2 2 0 1 1 4 0v.1a1 1 0 0 0 .7.9h.1a1 1 0 0 0 1.1-.2l.1-.1A2 2 0 1 1 20 7.6l-.1.1a1 1 0 0 0-.2 1.1v.1a1 1 0 0 0 .9.6H20a2 2 0 1 1 0 4h-.1a1 1 0 0 0-.9.6Z" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+    </svg>
+  );
+}
+
 const navItems = [
-  { href: '/', icon: '🔍', label: 'Search' },
-  { href: '/jobs', icon: '📁', label: 'Jobs' },
-  { href: '/jobs/create', icon: '➕', label: 'Create WO' },
-  { href: '/technicians', icon: '👥', label: 'Technicians' },
-  { href: '/compliance#frame-6', icon: '📊', label: 'Compliance' },
+  { href: '/', Icon: IconSearch, label: 'Home' },
+  { href: '/jobs', Icon: IconList, label: 'Jobs' },
+  { href: '/technicians', Icon: IconAvatar, label: 'Technicians' },
+  { href: '/compliance#frame-6', Icon: IconCopy, label: 'Compliance' },
 ];
 
 export function Sidebar() {
@@ -16,7 +57,6 @@ export function Sidebar() {
 
   return (
     <aside className="sidebar hover-expand">
-      {/* Decorative SVG background */}
       <svg className="sidebar-svg-bg" width="68" height="1078" viewBox="0 0 68 1078" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false">
         <rect x="-36" y="-1" width="103" height="1126" fill="#151413"/>
         <rect x="-36" y="-1" width="103" height="1126" stroke="#201939" strokeWidth="2"/>
@@ -36,23 +76,23 @@ export function Sidebar() {
       </svg>
 
       <nav className="nav-stack">
-        {navItems.map((item) => (
+        {navItems.map(({ href, Icon, label }) => (
           <Link
-            key={item.href}
-            href={item.href}
-            className={`nav-item ${pathname.startsWith(item.href.replace(/#.*/,'')) ? 'active' : ''}`}
-            aria-label={item.label}
-            title={item.label}
+            key={href}
+            href={href}
+            className={`nav-item ${pathname.startsWith(href.replace(/#.*/,'')) ? 'active' : ''}`}
+            aria-label={label}
+            title={label}
           >
-            <span className="nav-emoji" aria-hidden>{item.icon}</span>
-            <span className="item-label">{item.label}</span>
+            <span className="nav-icon" aria-hidden><Icon /></span>
+            <span className="item-label">{label}</span>
           </Link>
         ))}
       </nav>
 
       <div className="bottom-push">
         <Link href="/settings" className="nav-item" aria-label="Settings" title="Settings">
-          <span className="nav-emoji" aria-hidden>⚙️</span>
+          <span className="nav-icon" aria-hidden><IconSettings /></span>
           <span className="item-label">Settings</span>
         </Link>
       </div>
