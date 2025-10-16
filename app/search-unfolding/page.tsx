@@ -229,6 +229,55 @@ export default function SearchUnfoldingPage() {
                 ) : null}
               </div>
 
+              {/* Strips appear from behind mask 52px below map */}
+              <div className="reveal-stage">
+                <div className="reveal-mask" aria-hidden="true"></div>
+                <div className="tech-strip-list">
+                  {candidates.slice(0, 5).map((c) => {
+                    const tech = c.technicians;
+                    const coiColor = ((): string => {
+                      switch (tech?.coi_state) {
+                        case 'valid': return '#10b981';
+                        case 'expired': return '#ef4444';
+                        case 'uploaded': return '#f59e0b';
+                        default: return '#6b7280';
+                      }
+                    })();
+                    const licColor = ((): string => {
+                      switch (tech?.verification_status) {
+                        case 'verified': return '#10b981';
+                        case 'pending': return '#f59e0b';
+                        case 'expired': return '#ef4444';
+                        default: return '#6b7280';
+                      }
+                    })();
+
+                    return (
+                      <div key={c.id} className="tech-strip">
+                        <div className="tech-ident">
+                          <div className="tech-name">{tech?.full_name}</div>
+                          <div className="tech-distance">
+                            {c.distance_m != null ? `${(c.distance_m / 1000).toFixed(0)}Km Away` : ''}
+                            {c.duration_sec != null ? '' : ''}
+                          </div>
+                        </div>
+
+                        <div className="tech-lights">
+                          <span className="light-dot" style={{ backgroundColor: coiColor }} />
+                          <span className="light-dot" style={{ backgroundColor: licColor }} />
+                        </div>
+
+                        <div className="tech-rating">{(tech?.average_rating ?? 0).toFixed(1)}</div>
+
+                        <button className="tech-reasons" onClick={() => handleShowReasons(c)}>See reasons →</button>
+
+                        <button className="primary-button tech-assign" onClick={() => router.push(`/jobs/${jobId}`)}>Assign</button>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+
               {previewMetrics && (
                 <div className="slide-in-metrics">x: {previewMetrics.x}px, y: {previewMetrics.y}px, w: {previewMetrics.w}px, h: {previewMetrics.h}px</div>
               )}
