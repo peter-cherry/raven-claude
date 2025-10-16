@@ -20,6 +20,7 @@ export default function JobsPage() {
   const [jobs, setJobs] = useState<JobRow[]>([]);
   const [scores, setScores] = useState<any[] | null>(null);
   const [techMap, setTechMap] = useState<Record<string, { id: string; full_name: string | null; city: string | null; state: string | null }>>({});
+  const [reasonsFor, setReasonsFor] = useState<any | null>(null);
   const params = useSearchParams();
 
   useEffect(() => {
@@ -75,7 +76,10 @@ export default function JobsPage() {
                       </div>
                     </div>
                     <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                      <span className={`mini-dot ${(s.passed_requirements ?? []).some((r:any)=>r.type==='COI_VALID') ? 'dot-green':'dot-amber'}`} title="COI" />
+                      <span className={`mini-dot ${(s.passed_requirements ?? []).some((r:any)=>r.type==='LICENSE_STATE') ? 'dot-green':'dot-amber'}`} title="License" />
                       <span className={`score-badge ${s.score >= 80 ? 'high' : s.score >= 60 ? 'medium' : 'low'}`}>{s.score}</span>
+                      <button className="outline-button" onClick={() => setReasonsFor(s)}>See Reasons</button>
                       <Link href={`/technicians/${s.technician_id}`} className="outline-button">View</Link>
                     </div>
                   </div>
@@ -100,6 +104,28 @@ export default function JobsPage() {
             </Link>
           ))}
         </div>
+        {reasonsFor && (
+          <div className="policy-modal-overlay" onClick={() => setReasonsFor(null)}>
+            <div className="policy-modal-card" onClick={(e) => e.stopPropagation()}>
+              <div className="policy-list">
+                <div className="header-title" style={{ fontSize: 18 }}>Reasons for {techMap[reasonsFor.technician_id]?.full_name ?? reasonsFor.technician_id.slice(0,8)}</div>
+                <div>
+                  <div style={{ fontWeight: 700, marginTop: 8 }}>Passed</div>
+                  <ul>
+                    {(reasonsFor.passed_requirements ?? []).map((r: any, i: number) => (<li key={i}>{r.type}</li>))}
+                  </ul>
+                  <div style={{ fontWeight: 700, marginTop: 8 }}>Failed</div>
+                  <ul>
+                    {(reasonsFor.failed_requirements ?? []).map((r: any, i: number) => (<li key={i}>{r.type}</li>))}
+                  </ul>
+                </div>
+                <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
+                  <button className="outline-button" onClick={() => setReasonsFor(null)}>Close</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     </main>
   );
