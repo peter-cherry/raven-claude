@@ -57,7 +57,7 @@ export async function POST(req: Request) {
 
       const { error: iErr } = await supabase
         .from('compliance_policy_items')
-        .insert({ policy_id: policy.id, requirement_id: reqRow.id, required: !!it.required, min_valid_days: it.min_valid_days ?? 0, weight: it.weight ?? 0 });
+        .upsert({ policy_id: policy.id, requirement_id: reqRow.id, required: !!it.required, min_valid_days: it.min_valid_days ?? 0, weight: it.weight ?? 0 }, { onConflict: 'policy_id,requirement_id' });
       if (iErr) throw iErr;
     }
 
