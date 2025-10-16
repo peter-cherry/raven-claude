@@ -158,7 +158,7 @@ export default function HomePage() {
               <path d="M0 0H610.99V49.3A10 10 0 0 1 600.99 59.3H10A10 10 0 0 1 0 49.3V0Z" fill="var(--bg-secondary)" stroke="var(--border-accent)" strokeWidth="2" />
             </svg>
             <div className="sub-search-content">
-              <Link className="primary-button gradient-cta" href="/jobs/create">Create Work Order</Link>
+              <Link className="cta-muted-link" href="/jobs/create">Create Work Order</Link>
             </div>
           </div>
         </section>
