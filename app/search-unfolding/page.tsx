@@ -214,7 +214,7 @@ export default function SearchUnfoldingPage() {
                 {job?.lat != null && job?.lng != null ? (
                   <img
                     alt="Work order location"
-                    src={`https://maps.googleapis.com/maps/api/staticmap?center=${job.lat},${job.lng}&zoom=15&size=640x320&scale=2&maptype=roadmap&markers=color:0x8B5CF6|${job.lat},${job.lng}&key=${process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY}`}
+                    src={`https://maps.googleapis.com/maps/api/staticmap?center=${job.lat},${job.lng}&zoom=15&size=640x240&scale=2&maptype=roadmap&markers=color:0x8B5CF6|${job.lat},${job.lng}&key=${process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY}`}
                   />
                 ) : (
                   <div className="map-fallback">Map preview</div>
