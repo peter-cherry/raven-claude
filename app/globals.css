@@ -75,15 +75,15 @@ body {
 .search-tab-content { position: relative; z-index: 1; padding: 16px 24px; }
 .search-tab-hitarea { position: absolute; inset: 0; z-index: 2; display: block; cursor: pointer; }
 
-.sub-search-tab { position: absolute; top: 174px; left: 50%; transform: translateX(-50%); width: 619px; height: 59.3px; margin: 0; display: grid; align-items: center; z-index: 1; }
+.sub-search-tab { position: absolute; top: 174px; left: 50%; transform: translateX(-50%); width: 619px; height: 59.3px; margin: 0; display: grid; align-items: center; z-index: 3; }
 .sub-search-tab > svg { position: absolute; inset: 0; width: 100%; height: 100%; }
 .sub-search-content { position: relative; z-index: 1; padding: 8px 16px; }
 .sub-action svg { width: 42px; height: 42px; transition: transform .15s ease, filter .2s ease, color .2s ease; }
 .sub-action:hover svg { transform: scale(1.08); filter: none; color: #ffffff; }
-.sub-action { position: absolute; top: 50%; transform: translateY(-50%); width: 48px; height: 48px; display: grid; place-items: center; border-radius: 10px; border: 1.5px solid var(--border-accent); background: rgba(108,114,201,0.12); color: var(--border-accent); text-decoration: none; overflow: hidden; box-shadow: 0 0 4px rgba(0,0,0,0.25); }
+.sub-action { position: absolute; top: 50%; left: 12px; right: auto; transform: translateY(-50%); width: 48px; height: 48px; display: grid; place-items: center; border-radius: 10px; border: 1.5px solid var(--border-accent); background: rgba(108,114,201,0.12); color: var(--border-accent); text-decoration: none; overflow: hidden; box-shadow: 0 0 4px rgba(0,0,0,0.25); z-index: 4; }
 .sub-action::before { content: ""; position: absolute; inset: 0; border-radius: 10px; background: radial-gradient(60% 60% at 50% 50%, rgba(255,255,255,0.22), rgba(255,255,255,0) 70%); opacity: 0; transition: opacity .2s ease; pointer-events: none; }
-.sub-action.action-left { left: 12px; }
-.sub-action.action-right { right: 12px; }
+.sub-action.action-left { left: 12px; right: auto; }
+.sub-action.action-right { right: 12px; left: auto; }
 .sub-action::after { content: none; }
 .sub-action:hover { background: rgba(108,114,201,0.16); box-shadow: 0 0 4px rgba(0,0,0,0.25); color: #ffffff; filter: brightness(1.12); }
 .sub-action:hover::before { opacity: 1; }
