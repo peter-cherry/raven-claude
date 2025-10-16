@@ -75,7 +75,7 @@ export default function JobsPage() {
                       </div>
                     </div>
                     <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                      <span className="outline-button" style={{ padding: '4px 10px' }}>{s.score}</span>
+                      <span className={`score-badge ${s.score >= 80 ? 'high' : s.score >= 60 ? 'medium' : 'low'}`}>{s.score}</span>
                       <Link href={`/technicians/${s.technician_id}`} className="outline-button">View</Link>
                     </div>
                   </div>
