@@ -152,13 +152,33 @@ export default function HomePage() {
         const { data: membership } = await supabase.from('org_memberships').select('org_id').eq('user_id', user.id).single();
         if (membership?.org_id) orgId = membership.org_id;
         if (!orgId) throw new Error('Organization not found');
-        const payload = items.map((i) => ({ requirement_type: i.name, required: i.checked, weight: 1 }));
-        const { data: sess } = await supabase.auth.getSession();
-        const res = await fetch('/api/policies/draft', { method: 'POST', headers: { 'Content-Type': 'application/json', ...(sess.session?.access_token ? { Authorization: `Bearer ${sess.session.access_token}` } : {}) }, body: JSON.stringify({ org_id: orgId, items: payload }) });
-        const j = await res.json().catch(()=>({}));
-        if (!res.ok) { throw new Error(j?.error || 'Failed to save policy'); }
-        router.push(`/jobs/create?policy_id=${j.policy_id}`);
-        return j.policy_id as string;
+        const payload = items.map((i) => ({ requirement_type: i.name, required: i.checked, weight: 1, min_valid_days: 0 }));
+
+        await supabase.from('org_memberships').upsert({ user_id: user.id, org_id: orgId }, { onConflict: 'user_id,org_id' });
+
+        const { data: policy, error: pErr } = await supabase
+          .from('compliance_policies')
+          .insert({ org_id: orgId, status: 'draft' })
+          .select('id')
+          .single();
+        if (pErr || !policy) throw new Error(pErr?.message || 'Failed to create policy');
+
+        for (const it of payload) {
+          const { data: reqRow, error: rErr } = await supabase
+            .from('compliance_requirements')
+            .upsert({ org_id: orgId, requirement_type: it.requirement_type, weight: it.weight ?? 0, min_valid_days: it.min_valid_days ?? 0, enforcement: 'ENABLED' }, { onConflict: 'org_id,requirement_type' })
+            .select('id')
+            .single();
+          if (rErr || !reqRow) throw new Error(rErr?.message || 'Failed to ensure requirement');
+
+          const { error: iErr } = await supabase
+            .from('compliance_policy_items')
+            .insert({ policy_id: policy.id, requirement_id: reqRow.id, required: !!it.required, min_valid_days: it.min_valid_days ?? 0, weight: it.weight ?? 0 });
+          if (iErr) throw new Error(iErr.message);
+        }
+
+        router.push(`/jobs/create?policy_id=${policy.id}`);
+        return policy.id as string;
       }} />
     </main>
   );
