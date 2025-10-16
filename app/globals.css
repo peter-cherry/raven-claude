@@ -52,7 +52,7 @@ body {
 .nav-item.active .icon-glow { opacity: 1; }
 .nav-item:hover .icon-glow .glow-fill { filter: blur(1.5px); }
 .nav-item.active .icon-glow .glow-fill { filter: blur(2px); }
-.bottom-push { position: absolute; bottom: 16px; left: 0; width: 85px; display: grid; place-items: center; }
+.bottom-push { position: absolute; bottom: 31px; left: 0; width: 85px; display: grid; place-items: center; }
 
 /* Legacy icon styles kept for backwards compatibility */
 .sidebar-icon { width: 40px; height: 40px; display: grid; place-items: center; color: var(--text-secondary); cursor: pointer; border-radius: 8px; transition: all 0.2s; }
