@@ -1,5 +1,5 @@
 -- Drop existing function if it exists
-DROP FUNCTION IF EXISTS find_matching_technicians(p_job_id UUID) CASCADE;
+DROP FUNCTION IF EXISTS find_matching_technicians(UUID) CASCADE;
 
 -- Create Find Matching Technicians RPC function
 CREATE OR REPLACE FUNCTION find_matching_technicians(p_job_id UUID)
