@@ -15,7 +15,7 @@ export default function HomePage() {
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
   const router = useRouter();
-  const { user } = useAuth();
+  const { user, session } = useAuth();
 
   const handleSubmitWorkOrder = async (e: React.FormEvent) => {
     e.preventDefault();
