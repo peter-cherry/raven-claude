@@ -114,11 +114,13 @@ export function Sidebar() {
             : href.startsWith('/compliance')
             ? 'nav-compliance'
             : '';
+          const base = href.replace(/#.*/, '');
+          const isActive = href === '/' ? pathname === '/' : pathname.startsWith(base);
           return (
             <Link
               key={href}
               href={href}
-              className={`nav-item ${roleClass} ${pathname.startsWith(href.replace(/#.*/,'')) ? 'active' : ''}`}
+              className={`nav-item ${roleClass} ${isActive ? 'active' : ''}`}
               aria-label={label}
               title={label}
             >
