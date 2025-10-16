@@ -3,6 +3,8 @@
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import { supabase } from '@/lib/supabaseClient';
+import { useSearchParams } from 'next/navigation';
+import { getPolicyScores } from '@/lib/compliance';
 
 interface JobRow {
   id: string;
@@ -16,6 +18,8 @@ interface JobRow {
 
 export default function JobsPage() {
   const [jobs, setJobs] = useState<JobRow[]>([]);
+  const [scores, setScores] = useState<any[] | null>(null);
+  const params = useSearchParams();
 
   useEffect(() => {
     supabase
@@ -25,11 +29,30 @@ export default function JobsPage() {
       .then(({ data }) => setJobs((data as JobRow[]) ?? []));
   }, []);
 
+  useEffect(() => {
+    const policyId = params.get('policy_id');
+    if (!policyId) return;
+    getPolicyScores(policyId)
+      .then((d) => setScores((d ?? []).sort((a: any, b: any) => b.score - a.score)))
+      .catch(() => setScores([]));
+  }, [params]);
+
   return (
     <main className="content-area">
       <div className="content-inner" style={{ maxWidth: 1100, margin: '0 auto' }}>
         <h1 className="header-title">Jobs</h1>
         <p className="header-subtitle">Recent work orders</p>
+        {scores && (
+          <div className="container-card" style={{ marginBottom: 12 }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 12 }}>
+              <div>
+                <div style={{ fontWeight: 700 }}>Policy match scores</div>
+                <div style={{ color: 'var(--text-secondary)' }}>{scores.length} technicians evaluated</div>
+              </div>
+              <Link href={`/jobs/create?policy_id=${params.get('policy_id')}`} className="outline-button">Continue with policy</Link>
+            </div>
+          </div>
+        )}
         <div style={{ display: 'grid', gap: 12 }}>
           {jobs.map((j) => (
             <Link key={j.id} href={`/jobs/${j.id}`} className="container-card" style={{ textDecoration: 'none' }}>
