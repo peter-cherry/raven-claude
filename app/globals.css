@@ -32,9 +32,14 @@ body {
 
 /* Navigation stack */
 .nav-stack { display: grid; gap: 8px; }
-.nav-item { display: flex; align-items: center; gap: 12px; height: 40px; padding: 0 10px; color: #F9F3E5; border-radius: 8px; text-decoration: none; transition: background 0.2s, color 0.2s; }
+.nav-item { position: relative; display: flex; align-items: center; gap: 12px; height: 40px; padding: 0 10px; color: #F9F3E5; border-radius: 8px; text-decoration: none; transition: background 0.2s, color 0.2s; }
 .nav-item.active { color: #6A6288; background: transparent; }
-.nav-item:hover { color: #F9F3E5; background: rgba(255,255,255,0.08); }
+.nav-item:hover { color: #F9F3E5; background: rgba(255,255,255,0.06); }
+.nav-item::before { content: ""; position: absolute; left: -6px; top: 50%; transform: translateY(-50%); width: 3px; height: 20px; border-radius: 2px; background: transparent; opacity: 0; transition: all 0.2s ease; }
+.nav-item:hover::before { background: #ffffff; opacity: 1; box-shadow: 0 0 10px rgba(255,255,255,0.6); }
+.nav-item.active::before { background: #6A6288; opacity: 1; box-shadow: 0 0 12px rgba(106,98,136,0.8); }
+.nav-item:hover .nav-icon svg { filter: drop-shadow(0 0 6px rgba(255,255,255,0.6)); }
+.nav-item.active .nav-icon svg { filter: drop-shadow(0 0 8px rgba(106,98,136,0.8)); }
 .nav-icon, .nav-emoji { display: grid; place-items: center; width: 20px; height: 20px; }
 .bottom-push { margin-top: auto; }
 
