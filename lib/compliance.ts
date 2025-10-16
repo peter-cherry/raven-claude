@@ -1,5 +1,7 @@
 import { supabase } from '@/lib/supabaseClient';
 
+import { supabase } from '@/lib/supabaseClient';
+
 export type PolicyItemInput = {
   requirement_type: 'COI_VALID' | 'LICENSE_STATE' | string;
   required: boolean;

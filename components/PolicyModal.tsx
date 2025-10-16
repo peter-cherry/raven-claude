@@ -23,10 +23,13 @@ const initialPolicies: PolicyItem[] = [
 interface PolicyModalProps {
   isOpen: boolean;
   onClose: () => void;
+  onSave?: (items: PolicyItem[]) => Promise<string> | Promise<void>;
 }
 
-export function PolicyModal({ isOpen, onClose }: PolicyModalProps) {
+export function PolicyModal({ isOpen, onClose, onSave }: PolicyModalProps) {
   const [items, setItems] = useState<PolicyItem[]>(initialPolicies);
+  const [saving, setSaving] = useState(false);
+  const [err, setErr] = useState<string | null>(null);
 
   if (!isOpen) return null;
 
@@ -71,7 +74,20 @@ export function PolicyModal({ isOpen, onClose }: PolicyModalProps) {
         </div>
         <div className="policy-footer">
           <span className="policy-footer-text">Insert details wherever they reside on this page</span>
-          <button className="primary-button" onClick={onClose}>Done</button>
+          {err && <span className="policy-footer-text" style={{ color: 'var(--error)' }}>{err}</span>}
+          <button className="primary-button" disabled={saving} onClick={async () => {
+            setErr(null);
+            if (!onSave) { onClose(); return; }
+            try {
+              setSaving(true);
+              await onSave(items);
+              onClose();
+            } catch (e: any) {
+              setErr(e?.message || 'Failed to save');
+            } finally {
+              setSaving(false);
+            }
+          }}>{saving ? 'Saving...' : 'Done'}</button>
         </div>
       </div>
     </div>

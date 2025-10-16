@@ -2,6 +2,7 @@
 
 'use client';
 import { useState } from 'react';
+import { supabase } from '@/lib/supabaseClient';
 import { useRouter } from 'next/navigation';
 import { PolicyModal } from '@/components/PolicyModal';
 import { useAuth } from '@/components/AuthProvider';
@@ -142,7 +143,20 @@ export default function HomePage() {
           </div>
         </section>
       </div>
-      <PolicyModal isOpen={showPolicyModal} onClose={() => setShowPolicyModal(false)} />
+      <PolicyModal isOpen={showPolicyModal} onClose={() => setShowPolicyModal(false)} onSave={async (items) => {
+        let orgId = process.env.NEXT_PUBLIC_DEFAULT_ORG_ID as string | undefined;
+        if (user) {
+          const { data: membership } = await supabase.from('org_memberships').select('org_id').eq('user_id', user.id).single();
+          if (membership?.org_id) orgId = membership.org_id;
+        }
+        if (!orgId) throw new Error('Organization not found');
+        const payload = items.map((i) => ({ requirement_type: i.name, required: i.checked, weight: 1 }));
+        const res = await fetch('/api/policies/draft', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ org_id: orgId, items: payload }) });
+        if (!res.ok) { const j = await res.json().catch(()=>({})); throw new Error(j.error || 'Failed to save policy'); }
+        const j = await res.json();
+        router.push(`/jobs/create?policy_id=${j.policy_id}`);
+        return j.policy_id as string;
+      }} />
     </main>
   );
 }

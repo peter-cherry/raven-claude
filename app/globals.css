@@ -178,7 +178,7 @@ body {
 .policy-amount-input:focus { border-color: var(--accent-primary); box-shadow: 0 0 0 3px rgba(108, 114, 201, 0.2); }
 .policy-menu-btn { background: transparent; border: none; color: var(--text-secondary); cursor: pointer; padding: 4px; display: grid; place-items: center; }
 .policy-menu-btn:hover { color: var(--text-primary); }
-.policy-footer { border-top: 1px solid var(--border-subtle); padding: 12px 20px; display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+.policy-footer { border-top: 1px solid var(--border-subtle); padding: 12px 20px; display: flex; align-items: center; justify-content: space-between; gap: 8px; min-height: 56px; }
 .policy-footer-text { font-size: 12px; color: var(--text-secondary); }
 
 /* Compliance utilities */
