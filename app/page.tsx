@@ -3,6 +3,7 @@
 'use client';
 import { useState } from 'react';
 import { supabase } from '@/lib/supabaseClient';
+import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
 import { useRouter } from 'next/navigation';
 import { PolicyModal } from '@/components/PolicyModal';
 import { useAuth } from '@/components/AuthProvider';
@@ -153,12 +154,14 @@ export default function HomePage() {
         if (membership?.org_id) orgId = membership.org_id;
         if (!orgId) throw new Error('Organization not found');
         const payload = items.map((i) => ({ requirement_type: i.name, required: i.checked, weight: 1, min_valid_days: 0 }));
-        const { data: sess } = await supabase.auth.getSession();
+        const authClient = createClientComponentClient();
+        const { data: sess } = await authClient.auth.getSession();
         const token = sess.session?.access_token;
         const res = await fetch('/api/policies/draft', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json', ...(token ? { Authorization: `Bearer ${token}` } : {}) },
           body: JSON.stringify({ org_id: orgId, items: payload }),
+          credentials: 'same-origin',
         });
         const j = await res.json().catch(()=>({}));
         if (!res.ok) throw new Error(j?.error || 'Failed to save policy');
