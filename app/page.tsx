@@ -153,7 +153,8 @@ export default function HomePage() {
         if (membership?.org_id) orgId = membership.org_id;
         if (!orgId) throw new Error('Organization not found');
         const payload = items.map((i) => ({ requirement_type: i.name, required: i.checked, weight: 1 }));
-        const res = await fetch('/api/policies/draft', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ org_id: orgId, items: payload }) });
+        const { data: sess } = await supabase.auth.getSession();
+        const res = await fetch('/api/policies/draft', { method: 'POST', headers: { 'Content-Type': 'application/json', ...(sess.session?.access_token ? { Authorization: `Bearer ${sess.session.access_token}` } : {}) }, body: JSON.stringify({ org_id: orgId, items: payload }) });
         const j = await res.json().catch(()=>({}));
         if (!res.ok) { throw new Error(j?.error || 'Failed to save policy'); }
         router.push(`/jobs/create?policy_id=${j.policy_id}`);
