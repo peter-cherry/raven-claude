@@ -58,10 +58,11 @@ body {
 .sidebar-icon { width: 40px; height: 40px; display: grid; place-items: center; color: var(--text-secondary); cursor: pointer; border-radius: 8px; transition: all 0.2s; }
 .sidebar-icon:hover, .sidebar-icon.active { background: var(--accent-primary); color: white; }
 
-.main-content { flex: 1; margin-left: var(--sidebar-peek, 10px); }
+.main-content { flex: 1; margin-left: var(--sidebar-peek, 10px); position: relative; }
 
-.top-bar { height: 88px; background: var(--bg-secondary); border-bottom: 1px solid var(--border-subtle); display: flex; align-items: center; justify-content: space-between; padding: 0 32px; position: sticky; top: 0; z-index: 50; }
+/* Top bar removed; keeping elements via header-elements */
 .logo-section { display: flex; align-items: center; gap: 12px; }
+.header-elements { display: flex; align-items: center; justify-content: space-between; padding: 16px 32px; }
 .logo-icon { width: 32px; height: 32px; }
 .brand-name { font-size: 18px; font-weight: 700; letter-spacing: 0.5px; color: var(--accent-secondary); }
 .auth-buttons { display: flex; gap: 12px; }
@@ -162,7 +163,7 @@ body {
 @media (max-width: 768px) {
   .sidebar { --sidebar-peek: 8px; --open-offset: 5%; width: 240px; padding: 12px 6px; background: transparent; border-right: none; }
   .main-content { margin-left: var(--sidebar-peek, 8px); }
-  .top-bar { padding: 0 16px; height: 72px; }
+  /* top-bar removed on mobile as well */
   .content-area { padding: 20px 16px; }
   .container-card { padding: 24px; }
   .header-title { font-size: 24px; }
