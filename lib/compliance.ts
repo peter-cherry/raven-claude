@@ -48,3 +48,8 @@ export async function getPolicyScores(policyId: string) {
   if (error) throw error;
   return data as { technician_id: string; meets_all: boolean; score: number; failed_requirements: any }[];
 }
+
+export async function attachPolicyToJob(policyId: string, jobId: string) {
+  const { error } = await supabase.from('compliance_policies').update({ job_id: jobId }).eq('id', policyId);
+  if (error) throw error;
+}
