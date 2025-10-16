@@ -33,13 +33,20 @@ export async function POST(req: Request) {
 
     if (!userId) return NextResponse.json({ error: 'Not authenticated' }, { status: 401 });
 
-    const { data: membership } = await supabase
+    let { data: membership } = await supabase
       .from('org_memberships')
       .select('org_id')
       .eq('org_id', org_id)
       .eq('user_id', userId)
       .single();
-    if (!membership) return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+
+    if (!membership) {
+      const { error: mErr } = await supabase
+        .from('org_memberships')
+        .upsert({ user_id: userId, org_id }, { onConflict: 'user_id,org_id' });
+      if (mErr) return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+      membership = { org_id };
+    }
 
     const { data: policy, error: pErr } = await supabase
       .from('compliance_policies')
