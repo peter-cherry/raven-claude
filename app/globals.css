@@ -193,6 +193,15 @@ body {
 /* Work order form error */
 .wo-error { color: var(--error, #EF4444); font-size: 12px; margin-top: 8px; }
 
+/* Slide-in center card */
+.slide-in-center-card { position: fixed; left: 50%; top: 50%; transform: translate(-50%, -60%); width: 615px; height: 233.3px; background: var(--bg-secondary); border: 2px solid var(--border-accent); border-radius: 12px; box-shadow: var(--shadow-md, 0 4px 12px rgba(0,0,0,0.35)); z-index: 999; animation: slideInUp .35s ease forwards; }
+.slide-in-center-inner { height: 100%; display: grid; place-items: center; text-align: center; padding: 16px; }
+.slide-in-title { font-weight: 700; font-size: 18px; color: var(--text-primary); }
+.slide-in-sub { font-size: 14px; color: var(--text-secondary); }
+.slide-in-metrics { position: absolute; bottom: 8px; right: 12px; font-size: 12px; color: var(--text-secondary); }
+
+@keyframes slideInUp { from { opacity: 0; transform: translate(-50%, -70%); } to { opacity: 1; transform: translate(-50%, -50%); } }
+
 @media (max-width: 768px) {
   .search-tab-group { width: 92vw; position: relative; }
   .search-tab { width: 90vw; }
