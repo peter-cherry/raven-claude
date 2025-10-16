@@ -109,7 +109,8 @@ export default function JobDetailPage() {
                         <div style={{ color: 'var(--text-secondary)', fontSize: 12 }}>{t?.city ?? ''} {t?.state ?? ''}</div>
                       </div>
                     </div>
-                    <span className="outline-button" style={{ padding: '4px 10px' }}>{s.score}</span>
+                    <span className={`score-badge ${s.score >= 80 ? 'high' : s.score >= 60 ? 'medium' : 'low'}`}>{s.score}</span>
+                    <button className="primary-button" onClick={() => assign(s.technician_id)}>Assign</button>
                   </div>
                 );
               })}
