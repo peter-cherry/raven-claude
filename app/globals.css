@@ -156,6 +156,11 @@ body {
 .status-dot.active { background: var(--success); }
 .status-dot.inactive { background: var(--text-secondary); }
 
+.mini-dot { width: 14px; height: 14px; border-radius: 50%; display: inline-block; }
+.dot-green { background: rgba(16,185,129,0.9); }
+.dot-amber { background: rgba(245,158,11,0.9); }
+.dot-red { background: rgba(239,68,68,0.9); }
+
 .inline-links { display: flex; gap: 16px; justify-content: center; margin-top: 16px; flex-wrap: wrap; }
 .inline-link { color: var(--accent-secondary); text-decoration: none; font-size: 14px; transition: color 0.2s; }
 .inline-link:hover { color: var(--text-primary); text-decoration: underline; }
