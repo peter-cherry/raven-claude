@@ -209,8 +209,8 @@ body {
 .addr-city { color: var(--text-secondary); font-size: 14px; }
 
 /* Technician strips stage inside preview card */
-.reveal-stage { position: relative; width: 100%; margin-top: 85px; }
-.reveal-mask { position: absolute; top: -85px; left: 0; right: 0; height: 85px; background: var(--bg-secondary); z-index: 2; pointer-events: none; }
+.reveal-stage { position: relative; width: 100%; margin-top: 45px; }
+.reveal-mask { position: absolute; top: -45px; left: 0; right: 0; height: 45px; background: var(--bg-secondary); z-index: 2; pointer-events: none; }
 .tech-strip-list { display: grid; gap: 10px; place-items: center; }
 .tech-strip { width: 890px; height: 45px; background: #17171A; border: 1px solid #252529; border-radius: 12px; display: grid; grid-template-columns: 1fr 48px 42px auto auto; align-items: center; padding: 0 16px; gap: 12px; opacity: 0; transform: translateY(20px); animation: slideUpReveal .45s ease forwards; }
 .tech-strip:nth-child(1) { animation-delay: .05s; }
