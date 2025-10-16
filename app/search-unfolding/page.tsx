@@ -38,6 +38,7 @@ export default function SearchUnfoldingPage() {
   const [showPreviewCard, setShowPreviewCard] = useState(true);
   const previewRef = useRef<HTMLDivElement | null>(null);
   const [previewMetrics, setPreviewMetrics] = useState<{ x: number; y: number; w: number; h: number } | null>(null);
+  const [cardSettled, setCardSettled] = useState(false);
 
   // Persist current job_id for quick retesting
   useEffect(() => {
@@ -59,7 +60,10 @@ export default function SearchUnfoldingPage() {
         const r = previewRef.current?.getBoundingClientRect();
         if (r) setPreviewMetrics({ x: Math.round(r.left), y: Math.round(r.top), w: Math.round(r.width), h: Math.round(r.height) });
       }, 420);
-      return () => clearTimeout(timer);
+      const settleTimer = setTimeout(() => setCardSettled(true), 820);
+      return () => { clearTimeout(timer); clearTimeout(settleTimer); };
+    } else {
+      setCardSettled(false);
     }
   }, [showPreviewCard]);
 
@@ -233,7 +237,7 @@ export default function SearchUnfoldingPage() {
               <div className="reveal-stage">
                 <div className="reveal-mask" aria-hidden="true"></div>
                 <div className="tech-strip-list">
-                  {candidates.slice(0, 5).map((c) => {
+                  {cardSettled && candidates.slice(0, 5).map((c) => {
                     const tech = c.technicians;
                     const coiColor = ((): string => {
                       switch (tech?.coi_state) {
