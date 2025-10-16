@@ -117,17 +117,28 @@ export function Sidebar() {
       </svg>
 
       <nav className="nav-stack">
-        {navItems.map(({ href, Icon, label }) => (
-          <Link
-            key={href}
-            href={href}
-            className={`nav-item ${pathname.startsWith(href.replace(/#.*/,'')) ? 'active' : ''}`}
-            aria-label={label}
-            title={label}
-          >
-            <span className="nav-icon" aria-hidden><Icon /></span>
-          </Link>
-        ))}
+        {navItems.map(({ href, Icon, label }) => {
+          const roleClass = href === '/'
+            ? 'nav-home'
+            : href.startsWith('/jobs')
+            ? 'nav-jobs'
+            : href.startsWith('/technicians')
+            ? 'nav-tech'
+            : href.startsWith('/compliance')
+            ? 'nav-compliance'
+            : '';
+          return (
+            <Link
+              key={href}
+              href={href}
+              className={`nav-item ${roleClass} ${pathname.startsWith(href.replace(/#.*/,'')) ? 'active' : ''}`}
+              aria-label={label}
+              title={label}
+            >
+              <span className="nav-icon" aria-hidden><Icon /></span>
+            </Link>
+          );
+        })}
       </nav>
 
       <div className="bottom-push">
