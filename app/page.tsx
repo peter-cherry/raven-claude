@@ -108,7 +108,8 @@ export default function HomePage() {
     <main className="content-area">
       <div className="content-inner center-viewport">
         <section className="home-hero">
-          <div className="search-tab">
+          <div className="search-tab-group">
+            <div className="search-tab">
             <Link href="/jobs/create" className="search-tab-hitarea" aria-label="Open create work order form"></Link>
             <svg viewBox="0 0 615 174" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false">
               <rect x="0" y="0" width="615" height="174" rx="10" ry="10" fill="var(--bg-secondary)" stroke="var(--border-accent)" strokeWidth="2" />
@@ -117,11 +118,12 @@ export default function HomePage() {
               <h2 className="wo-title">Create a WO  +</h2>
             </div>
           </div>
-          <div className="sub-search-tab">
-            <svg viewBox="0 0 610.99 59.3" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false">
-              <path d="M0 0H610.99V49.3A10 10 0 0 1 600.99 59.3H10A10 10 0 0 1 0 49.3V0Z" fill="var(--bg-secondary)" stroke="var(--border-accent)" strokeWidth="2" />
-            </svg>
-            <div className="sub-search-content"></div>
+            <div className="sub-search-tab">
+              <svg viewBox="0 0 610.99 59.3" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false">
+                <path d="M0 0H610.99V49.3A10 10 0 0 1 600.99 59.3H10A10 10 0 0 1 0 49.3V0Z" fill="#2A2B39" stroke="var(--border-accent)" strokeWidth="2" />
+              </svg>
+              <div className="sub-search-content"></div>
+            </div>
           </div>
         </section>
       </div>
