@@ -49,6 +49,19 @@ export default function SearchUnfoldingPage() {
 
   const easeInOutCubic = (t: number) => (t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2);
 
+  const latRad = (lat: number) => Math.log(Math.tan(Math.PI / 4 + (lat * Math.PI) / 360));
+  const computeFitZoom = (bounds: { north: number; south: number; east: number; west: number }, mapPx: { w: number; h: number }) => {
+    const WORLD_DIM = 256;
+    const ZOOM_MAX = 21;
+    const latFraction = (latRad(bounds.north) - latRad(bounds.south)) / Math.PI || 1e-9;
+    const lngDiff = bounds.east - bounds.west;
+    const lngFraction = ((lngDiff < 0 ? lngDiff + 360 : lngDiff) / 360) || 1e-9;
+    const latZoom = Math.log2(mapPx.h / WORLD_DIM / latFraction);
+    const lngZoom = Math.log2(mapPx.w / WORLD_DIM / lngFraction);
+    const zoom = Math.floor(Math.min(latZoom, lngZoom, ZOOM_MAX));
+    return Math.max(2, Math.min(zoom, ZOOM_MAX));
+  };
+
   // Persist current job_id for quick retesting
   useEffect(() => {
     if (jobId) {
@@ -76,44 +89,84 @@ export default function SearchUnfoldingPage() {
     }
   }, [showPreviewCard]);
 
-  // Animate map: start slightly offset + lower zoom, then pan/zoom to target, loop continuously
+  // Animate map: hover from NW of bounds to work order, ease in/out, then zoom out to fit all techs; loop
   useEffect(() => {
     if (!mapCenter) return;
     let killed = false;
 
-    const startZoom = 12;
-    const endZoom = 15;
-    const steps = 14;
+    // Collect unique tech points
+    const unique = new Map<string, { lat: number; lng: number }>();
+    for (const c of candidates) {
+      const t = c.technicians;
+      if (!t || t.id == null || t.lat == null || t.lng == null) continue;
+      if (!unique.has(t.id)) unique.set(t.id, { lat: Number(t.lat), lng: Number(t.lng) });
+    }
+    const techPoints = Array.from(unique.values());
+
+    const jobPt = mapCenter; // job center from geocode/db
+    const allLats = [jobPt.lat, ...techPoints.map((p) => p.lat)];
+    const allLngs = [jobPt.lng, ...techPoints.map((p) => p.lng)];
+
+    const pad = 0.01; // ~1.1km lat padding
+    const bounds = allLats.length > 0
+      ? {
+          north: Math.max(...allLats) + pad,
+          south: Math.min(...allLats) - pad,
+          east: Math.max(...allLngs) + pad,
+          west: Math.min(...allLngs) - pad,
+        }
+      : { north: jobPt.lat + pad, south: jobPt.lat - pad, east: jobPt.lng + pad, west: jobPt.lng - pad };
+
+    const fitCenter = { lat: (bounds.north + bounds.south) / 2, lng: (bounds.east + bounds.west) / 2 };
+    const fitZoom = computeFitZoom(bounds, { w: 640, h: 240 });
+    const jobViewOffset = 0.003; // place view slightly "above" the job
+    const jobCenter = { lat: jobPt.lat + jobViewOffset, lng: jobPt.lng };
+    const zoomIn = Math.min(18, Math.max(fitZoom + 3, 14));
+
+    const steps = 16;
     const intervalMs = 90;
-    const pauseMs = 700;
+    const pauseMsAtJob = 900;
+    const pauseMsAtFit = 700;
+
+    const startFrom = { lat: bounds.north, lng: bounds.west }; // NW corner hover-in
+
+    let phase: 'toJob' | 'toFit' = 'toJob';
 
     const run = () => {
       if (killed) return;
-      const start = { lat: mapCenter.lat + 0.01, lng: mapCenter.lng + 0.01 };
-      setMapViewCenter(start);
+
+      const startCenter = phase === 'toJob' ? startFrom : jobCenter;
+      const endCenter = phase === 'toJob' ? jobCenter : fitCenter;
+      const startZoom = phase === 'toJob' ? fitZoom : zoomIn;
+      const endZoom = phase === 'toJob' ? zoomIn : fitZoom;
+
+      setMapViewCenter(startCenter);
       setMapZoom(startZoom);
+
       let i = 0;
       const id = setInterval(() => {
         if (killed) { clearInterval(id); return; }
         i += 1;
         const t = Math.min(1, i / steps);
         const te = easeInOutCubic(t);
-        const lat = start.lat + (mapCenter.lat - start.lat) * te;
-        const lng = start.lng + (mapCenter.lng - start.lng) * te;
+        const lat = startCenter.lat + (endCenter.lat - startCenter.lat) * te;
+        const lng = startCenter.lng + (endCenter.lng - startCenter.lng) * te;
         const zoom = Math.round(startZoom + (endZoom - startZoom) * te);
         setMapViewCenter({ lat, lng });
         setMapZoom(zoom);
-        setFrameKey((k) => k + 1); // cache-bust frames
+        setFrameKey((k) => k + 1);
         if (t >= 1) {
           clearInterval(id);
-          if (!killed) setTimeout(run, pauseMs);
+          phase = phase === 'toJob' ? 'toFit' : 'toJob';
+          const pause = phase === 'toFit' ? pauseMsAtJob : pauseMsAtFit;
+          if (!killed) setTimeout(run, pause);
         }
       }, intervalMs);
     };
 
     run();
     return () => { killed = true; };
-  }, [mapCenter, animKey]);
+  }, [mapCenter, candidates, animKey]);
 
   // Load job for map/address
   useEffect(() => {
