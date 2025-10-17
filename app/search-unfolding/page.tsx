@@ -201,7 +201,7 @@ export default function SearchUnfoldingPage() {
                 {job?.lat != null && job?.lng != null ? (
                   <img
                     alt="Work order location"
-                    src={`https://maps.googleapis.com/maps/api/staticmap?center=${job.lat},${job.lng}&zoom=15&size=640x240&scale=2&maptype=roadmap&markers=color:0x6C72C9|${job.lat},${job.lng}&style=element:geometry|color:0x1D1D20&style=feature:water|element:geometry|color:0x0E0E12&style=feature:road|element:geometry|color:0x2A2931&style=feature:poi|element:geometry|color:0x1D1D20&style=feature:all|element:labels.text.fill|color:0xA0A0A8&style=feature:all|element:labels.text.stroke|color:0x1D1D20&key=${process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY}`}
+                    src={`https://maps.googleapis.com/maps/api/staticmap?center=${job.lat},${job.lng}&zoom=15&size=640x240&scale=2&maptype=roadmap&style=element:geometry|color:0x1D1D20&style=feature:water|element:geometry|color:0x0E0E12&style=feature:road|element:geometry|color:0x2A2931&style=feature:poi|element:geometry|color:0x1D1D20&style=feature:all|element:labels.text.fill|color:0xA0A0A8&style=feature:all|element:labels.text.stroke|color:0x1D1D20&key=${process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY}`}
                   />
                 ) : (
                   <div className="map-fallback">Map preview</div>
