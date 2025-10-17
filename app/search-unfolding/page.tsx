@@ -223,6 +223,19 @@ export default function SearchUnfoldingPage() {
     return () => { mounted = false; clearInterval(id); };
   }, [jobId]);
 
+  // Persist match_score to DB when missing or outdated
+  useEffect(() => {
+    if (!candidates?.length) return;
+    const updates = candidates.map(async (c) => {
+      const computed = computeMatchScore(c);
+      if (computed == null) return;
+      if (c.match_score == null || Math.abs(Number(c.match_score) - computed) > 0.01) {
+        await supabase.from('job_candidates').update({ match_score: computed }).eq('id', c.id);
+      }
+    });
+    void Promise.allSettled(updates);
+  }, [candidates]);
+
   const getComplianceScore = (tech: CandidateRow['technicians']) => {
     if (!tech) return 0;
     let score = 0;
@@ -230,6 +243,34 @@ export default function SearchUnfoldingPage() {
     if (tech.verification_status === 'verified') score += 40;
     score += Math.floor(((tech.average_rating || 0) / 5) * 20);
     return Math.min(score, 100);
+  };
+
+  const computeMatchScore = (c: CandidateRow) => {
+    const t = c.technicians;
+    if (!t) return null;
+    const rating = Math.max(0, Math.min(5, t.average_rating ?? 0)) / 5; // 0..1
+    const coi = (() => {
+      switch (t.coi_state) {
+        case 'valid': return 1;
+        case 'uploaded': return 0.5;
+        case 'expired': return 0;
+        default: return 0; // none
+      }
+    })();
+    const lic = (() => {
+      switch (t.verification_status) {
+        case 'verified': return 1;
+        case 'pending': return 0.5;
+        case 'expired': return 0;
+        default: return 0; // none
+      }
+    })();
+    const compliance = (coi + lic) / 2; // 0..1
+    const maxD = 50000; // 50km cap
+    const d = typeof c.distance_m === 'number' ? Math.max(0, Math.min(maxD, Number(c.distance_m))) : maxD;
+    const distanceScore = 1 - d / maxD; // closer is better
+    const score = 0.5 * rating + 0.3 * compliance + 0.2 * distanceScore; // 0..1
+    return Math.max(0, Math.min(1, score));
   };
 
   const getComplianceLight = (state: string | undefined) => {
@@ -445,8 +486,8 @@ export default function SearchUnfoldingPage() {
 
                         <div className="tech-rating">
                           {c.match_score != null
-                            ? Math.round(c.match_score * 100)
-                            : (tech?.average_rating ?? 0).toFixed(1)}
+                            ? Math.round(Number(c.match_score) * 100)
+                            : Math.round((computeMatchScore(c) ?? 0) * 100)}
                         </div>
 
                         <button className="tech-reasons" onClick={() => handleShowReasons(c)}>See reasons →</button>
