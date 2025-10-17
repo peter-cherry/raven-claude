@@ -235,31 +235,11 @@ export default function SearchUnfoldingPage() {
   };
 
   const computeMatchScore = (c: CandidateRow) => {
-    const t = c.technicians;
-    if (!t) return null;
-    const rating = Math.max(0, Math.min(5, t.average_rating ?? 0)) / 5; // 0..1
-    const coi = (() => {
-      switch (t.coi_state) {
-        case 'valid': return 1;
-        case 'uploaded': return 0.5;
-        case 'expired': return 0;
-        default: return 0; // none
-      }
-    })();
-    const lic = (() => {
-      switch (t.verification_status) {
-        case 'verified': return 1;
-        case 'pending': return 0.5;
-        case 'expired': return 0;
-        default: return 0; // none
-      }
-    })();
-    const compliance = (coi + lic) / 2; // 0..1
+    // No rating in scoring. Fallback is purely distance-based so nearest can be 100 when no requirements are enforced.
     const maxD = 50000; // 50km cap
     const d = typeof c.distance_m === 'number' ? Math.max(0, Math.min(maxD, Number(c.distance_m))) : maxD;
-    const distanceScore = 1 - d / maxD; // closer is better
-    const score = 0.5 * rating + 0.3 * compliance + 0.2 * distanceScore; // 0..1
-    return Math.max(0, Math.min(1, score));
+    const distanceScore = 1 - d / maxD; // 0..1, closer is better
+    return Math.max(0, Math.min(1, distanceScore));
   };
 
   const getComplianceLight = (state: string | undefined) => {
