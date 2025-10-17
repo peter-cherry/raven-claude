@@ -39,6 +39,7 @@ export default function SearchUnfoldingPage() {
   const previewRef = useRef<HTMLDivElement | null>(null);
   const [previewMetrics, setPreviewMetrics] = useState<{ x: number; y: number; w: number; h: number } | null>(null);
   const [cardSettled, setCardSettled] = useState(false);
+  const [animKey, setAnimKey] = useState(0);
 
   // Persist current job_id for quick retesting
   useEffect(() => {
@@ -196,11 +197,11 @@ export default function SearchUnfoldingPage() {
           <div ref={previewRef} className="slide-in-center-card">
             <div className="slide-in-center-inner" style={{ width: '100%', padding: 0, display: 'grid', gap: 0 }}>
               {/* Google Static Maps preview */}
-              <div className="map-preview">
+              <div className="map-preview" onClick={() => { setAnimKey((k) => k + 1); setCardSettled(false); setTimeout(() => setCardSettled(true), 50); }}>
                 {job?.lat != null && job?.lng != null ? (
                   <img
                     alt="Work order location"
-                    src={`https://maps.googleapis.com/maps/api/staticmap?center=${job.lat},${job.lng}&zoom=15&size=640x240&scale=2&maptype=roadmap&markers=color:0x8B5CF6|${job.lat},${job.lng}&key=${process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY}`}
+                    src={`https://maps.googleapis.com/maps/api/staticmap?center=${job.lat},${job.lng}&zoom=15&size=640x240&scale=2&maptype=roadmap&markers=color:0x6C72C9|${job.lat},${job.lng}&style=element:geometry|color:0x1D1D20&style=feature:water|element:geometry|color:0x0E0E12&style=feature:road|element:geometry|color:0x2A2931&style=feature:poi|element:geometry|color:0x1D1D20&style=feature:all|element:labels.text.fill|color:0xA0A0A8&style=feature:all|element:labels.text.stroke|color:0x1D1D20&key=${process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY}`}
                   />
                 ) : (
                   <div className="map-fallback">Map preview</div>
@@ -221,7 +222,7 @@ export default function SearchUnfoldingPage() {
               {/* Strips appear from behind mask 52px below map */}
               <div className="reveal-stage">
                 <div className="reveal-mask" aria-hidden="true"></div>
-                <div className="tech-strip-list">
+                <div className="tech-strip-list" key={animKey}>
                   {cardSettled && candidates.slice(0, 5).map((c) => {
                     const tech = c.technicians;
                     const coiColor = ((): string => {
