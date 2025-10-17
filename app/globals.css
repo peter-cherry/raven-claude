@@ -213,13 +213,13 @@ body {
 .reveal-stage { position: relative; width: 100%; margin-top: 20px; }
 .reveal-mask { position: absolute; top: -45px; left: 0; right: 0; height: 45px; background: var(--bg-secondary); z-index: 2; pointer-events: none; }
 .reveal-mask::after { content: ""; position: absolute; left: 10px; right: 10px; top: 45px; height: 0; box-shadow: 0 4px 3.5px rgba(124, 111, 130, 0.25); }
-.tech-strip-list { display: grid; gap: 10px; place-items: center; }
-.tech-strip { width: 865px; height: 45px; margin: 0 auto; background: #17171A; border: 1px solid #252529; border-radius: 12px; display: grid; grid-template-columns: 1fr 48px 42px auto auto; align-items: center; padding: 0 16px; gap: 12px; opacity: 0; transform: translateY(-28px); animation: slideUpReveal .85s cubic-bezier(0.16, 1, 0.3, 1) forwards; will-change: transform, opacity; }
-.tech-strip:nth-child(1) { animation-delay: .80s; }
-.tech-strip:nth-child(2) { animation-delay: .95s; }
-.tech-strip:nth-child(3) { animation-delay: 1.10s; }
-.tech-strip:nth-child(4) { animation-delay: 1.25s; }
-.tech-strip:nth-child(5) { animation-delay: 1.40s; }
+.tech-strip-list { display: grid; gap: 10px; place-items: center; position: relative; --row-h: 45px; --row-gap: 10px; }
+.tech-strip { width: 865px; height: 45px; margin: 0 auto; background: #17171A; border: 1px solid #252529; border-radius: 12px; display: grid; grid-template-columns: 1fr 48px 42px auto auto; align-items: center; padding: 0 16px; gap: 12px; opacity: 0; transform: translateY(var(--stack-offset, 0)); animation: unstackDown .9s cubic-bezier(0.16, 1, 0.3, 1) forwards; will-change: transform, opacity; }
+.tech-strip-list > .tech-strip:nth-child(1) { --stack-offset: 0px; }
+.tech-strip-list > .tech-strip:nth-child(2) { --stack-offset: calc(-1 * (var(--row-h) + var(--row-gap))); }
+.tech-strip-list > .tech-strip:nth-child(3) { --stack-offset: calc(-2 * (var(--row-h) + var(--row-gap))); }
+.tech-strip-list > .tech-strip:nth-child(4) { --stack-offset: calc(-3 * (var(--row-h) + var(--row-gap))); }
+.tech-strip-list > .tech-strip:nth-child(5) { --stack-offset: calc(-4 * (var(--row-h) + var(--row-gap))); }
 
 .tech-ident { display: grid; gap: 2px; text-align: left; min-width: 0; }
 .tech-name { font-weight: 700; font-size: 14px; color: var(--text-primary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
@@ -234,7 +234,7 @@ body {
 
 .tech-assign { padding: 6px 14px; font-size: 13px; border-radius: 8px; }
 
-@keyframes slideUpReveal { 0% { opacity: 0; transform: translateY(-28px); } 70% { opacity: 1; transform: translateY(-10px); } 100% { opacity: 1; transform: translateY(0); } }
+@keyframes unstackDown { 0% { opacity: 0; transform: translateY(var(--stack-offset, 0)); } 60% { opacity: 1; transform: translateY(calc(var(--stack-offset, 0) * 0.35)); } 100% { opacity: 1; transform: translateY(0); } }
 
 @keyframes slideInCenterFromBelow { 0% { opacity: 0; transform: translate3d(-50%, calc(100vh + 10px), 0); } 100% { opacity: 1; transform: translate3d(-50%, calc(-50% + 20px), 0); } }
 
