@@ -194,7 +194,7 @@ body {
 .wo-error { color: var(--error, #EF4444); font-size: 12px; margin-top: 8px; }
 
 /* Slide-in center card */
-.slide-in-center-card { position: fixed; top: 50%; left: 50%; width: 890px; height: 720px; max-width: 92vw; background: var(--bg-secondary); border: 2px solid var(--border-accent); border-radius: 12px; box-shadow: var(--shadow-md, 0 4px 12px rgba(0,0,0,0.35)); z-index: 2; pointer-events: none; transform: translate3d(-50%, calc(100vh + 10px), 0); animation: slideInCenterFromBelow .9s cubic-bezier(0.22, 0.61, 0.36, 1) forwards; will-change: transform; overflow: hidden; backface-visibility: hidden; transform-style: preserve-3d; contain: layout paint; } @media (max-width: 1024px) { .slide-in-center-card { width: min(890px, 92vw); height: min(720px, calc(100vh - 120px)); } }
+.slide-in-center-card { position: fixed; top: 50%; left: 50%; width: 890px; height: 720px; max-width: 92vw; background: var(--bg-secondary); border: 2px solid var(--border-accent); border-radius: 12px; box-shadow: var(--shadow-md, 0 4px 12px rgba(0,0,0,0.35)); z-index: 2; pointer-events: auto; transform: translate3d(-50%, calc(100vh + 10px), 0); animation: slideInCenterFromBelow .9s cubic-bezier(0.22, 0.61, 0.36, 1) forwards; will-change: transform; overflow: hidden; backface-visibility: hidden; transform-style: preserve-3d; contain: layout paint; } @media (max-width: 1024px) { .slide-in-center-card { width: min(890px, 92vw); height: min(720px, calc(100vh - 120px)); } }
 .slide-in-center-inner { height: 100%; display: grid; place-items: start center; text-align: center; padding: 0; position: relative; }
 .slide-in-title { font-weight: 700; font-size: 18px; color: var(--text-primary); }
 .slide-in-sub { font-size: 14px; color: var(--text-secondary); }
