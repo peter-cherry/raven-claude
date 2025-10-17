@@ -194,7 +194,7 @@ export default function SearchUnfoldingPage() {
         {/* Slide-in centered preview card */}
         {showPreviewCard && (
           <div ref={previewRef} className="slide-in-center-card">
-            <div className="slide-in-center-inner" style={{ width: '100%', padding: 0, display: 'grid', gap: 16 }}>
+            <div className="slide-in-center-inner" style={{ width: '100%', padding: 0, display: 'grid', gap: 0 }}>
               {/* Google Static Maps preview */}
               <div className="map-preview">
                 {job?.lat != null && job?.lng != null ? (
@@ -215,8 +215,8 @@ export default function SearchUnfoldingPage() {
               </div>
 
               {/* Heading below map, 10px offset */}
-              <h1 className="header-title" style={{ margin: '10px 10px 0' }}>Finding matches...</h1>
-              <p className="header-subtitle" style={{ margin: '0 10px' }}>We are looking for nearby compliant technicians.</p>
+              <h1 className="header-title" style={{ margin: '10px 20px 0' }}>Finding matches...</h1>
+              <p className="header-subtitle" style={{ margin: '-10px 20px 0' }}>We are looking for nearby compliant technicians.</p>
 
               {/* Strips appear from behind mask 52px below map */}
               <div className="reveal-stage">
