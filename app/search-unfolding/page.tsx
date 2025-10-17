@@ -30,6 +30,7 @@ export default function SearchUnfoldingPage() {
   const [lastJobId, setLastJobId] = useState<string | null>(null);
   const [candidates, setCandidates] = useState<CandidateRow[]>([]);
   const [job, setJob] = useState<{ address_text: string | null; city: string | null; state: string | null; lat: number | null; lng: number | null } | null>(null);
+  const [mapCenter, setMapCenter] = useState<{ lat: number; lng: number } | null>(null);
   const [loading, setLoading] = useState(true);
   const [selectedReasonsId, setSelectedReasonsId] = useState<string | null>(null);
   const [reasons, setReasons] = useState<ReasonDetail[]>([]);
@@ -78,6 +79,32 @@ export default function SearchUnfoldingPage() {
       .single()
       .then(({ data }) => setJob(data as any));
   }, [jobId]);
+
+  // Determine map center with fallback: use job lat/lng; else geocode address; else default Miami
+  useEffect(() => {
+    const key = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY;
+    if (!job) return;
+    if (job.lat != null && job.lng != null) {
+      setMapCenter({ lat: job.lat, lng: job.lng });
+      return;
+    }
+    const addr = [job.address_text, job.city, job.state].filter(Boolean).join(', ');
+    if (addr && key) {
+      fetch(`https://maps.googleapis.com/maps/api/geocode/json?address=${encodeURIComponent(addr)}&key=${key}`)
+        .then((r) => r.json())
+        .then((g) => {
+          const loc = g?.results?.[0]?.geometry?.location;
+          if (loc && typeof loc.lat === 'number' && typeof loc.lng === 'number') {
+            setMapCenter({ lat: loc.lat, lng: loc.lng });
+          } else {
+            setMapCenter({ lat: 25.7634961, lng: -80.1905671 });
+          }
+        })
+        .catch(() => setMapCenter({ lat: 25.7634961, lng: -80.1905671 }));
+    } else {
+      setMapCenter({ lat: 25.7634961, lng: -80.1905671 });
+    }
+  }, [job]);
 
   useEffect(() => {
     let mounted = true;
@@ -203,10 +230,10 @@ export default function SearchUnfoldingPage() {
             <div className="slide-in-center-inner" style={{ width: '100%', padding: 0, display: 'grid', gap: 0 }}>
               {/* Google Static Maps preview */}
               <div className="map-preview" onClick={() => { setAnimKey((k) => k + 1); setCardSettled(false); setTimeout(() => setCardSettled(true), 50); }}>
-                {job?.lat != null && job?.lng != null ? (
+                {mapCenter ? (
                   <img
                     alt="Work order location"
-                    src={`https://maps.googleapis.com/maps/api/staticmap?center=${job.lat},${job.lng}&zoom=15&size=640x240&scale=2&maptype=roadmap&style=element:geometry|color:0x1D1D20&style=feature:water|element:geometry|color:0x0E0E12&style=feature:road|element:geometry|color:0x2A2931&style=feature:poi|element:geometry|color:0x1D1D20&style=feature:all|element:labels.text.fill|color:0xA0A0A8&style=feature:all|element:labels.text.stroke|color:0x1D1D20&key=${process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY}`}
+                    src={`https://maps.googleapis.com/maps/api/staticmap?center=${mapCenter.lat},${mapCenter.lng}&zoom=15&size=640x240&scale=2&maptype=roadmap&style=element:geometry|color:0x1D1D20&style=feature:water|element:geometry|color:0x0E0E12&style=feature:road|element:geometry|color:0x2A2931&style=feature:poi|element:geometry|color:0x1D1D20&style=feature:all|element:labels.text.fill|color:0xA0A0A8&style=feature:all|element:labels.text.stroke|color:0x1D1D20&key=${process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY}`}
                   />
                 ) : (
                   <div className="map-fallback">Map preview</div>
