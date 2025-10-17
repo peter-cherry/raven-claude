@@ -380,7 +380,7 @@ export default function SearchUnfoldingPage() {
                   <img
                     alt="Work order location"
                     src={staticMapUrl}
-                    className={`map-img ${!mapAnimDone ? 'map-motion' : ''} ${showMarkers ? 'markers-pop' : ''}`}
+                    className={`map-img ${showMarkers ? 'markers-pop' : ''}`}
                     onError={(e) => { (e.currentTarget as HTMLImageElement).style.opacity = '0'; }}
                   />
                 ) : (
