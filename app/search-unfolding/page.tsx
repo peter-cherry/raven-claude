@@ -87,11 +87,13 @@ export default function SearchUnfoldingPage() {
 
     const easeInOutCubic = (t: number) => (t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2);
 
-    // Start ~100 miles NW
-    const meters = 100 * 1609.34;
-    const degLat = meters / 111320;
-    const degLng = meters / (111320 * Math.cos(mapCenter.lat * Math.PI / 180));
-    const startCenter = { lat: mapCenter.lat + degLat, lng: mapCenter.lng - degLng };
+    // Start ~100m away in a random direction
+    const meters = 100; // 100 meters
+    const theta = Math.random() * Math.PI * 2;
+    const latRad = (mapCenter.lat * Math.PI) / 180;
+    const dLat = (meters * Math.cos(theta)) / 111320;
+    const dLng = (meters * Math.sin(theta)) / (111320 * Math.cos(latRad));
+    const startCenter = { lat: mapCenter.lat + dLat, lng: mapCenter.lng + dLng };
 
     // Zoom targets
     const zoomBird = 8;  // start
