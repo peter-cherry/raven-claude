@@ -473,11 +473,13 @@ export default function SearchUnfoldingPage() {
                           <span className="light-dot" style={{ backgroundColor: licColor }} />
                         </div>
 
-                        <div className="tech-rating">
-                          {c.match_score != null
+                        {(() => {
+                          const pct = c.match_score != null
                             ? Math.round(Number(c.match_score) * 100)
-                            : Math.round((computeMatchScore(c) ?? 0) * 100)}
-                        </div>
+                            : Math.round((computeMatchScore(c) ?? 0) * 100);
+                          const scoreClass = pct >= 80 ? 'score-high' : pct >= 60 ? 'score-med' : 'score-low';
+                          return <div className={`tech-rating ${scoreClass}`}>{pct}</div>;
+                        })()}
 
                         <button className="tech-reasons" onClick={() => handleShowReasons(c)}>See reasons →</button>
 
