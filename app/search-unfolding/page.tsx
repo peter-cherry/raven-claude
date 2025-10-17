@@ -43,24 +43,7 @@ export default function SearchUnfoldingPage() {
   const [previewMetrics, setPreviewMetrics] = useState<{ x: number; y: number; w: number; h: number } | null>(null);
   const [cardSettled, setCardSettled] = useState(false);
   const [animKey, setAnimKey] = useState(0);
-  const [mapZoom, setMapZoom] = useState<number>(15);
-  const [mapViewCenter, setMapViewCenter] = useState<{ lat: number; lng: number } | null>(null);
-  const [frameKey, setFrameKey] = useState(0);
-
-  const easeInOutCubic = (t: number) => (t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2);
-
-  const latRad = (lat: number) => Math.log(Math.tan(Math.PI / 4 + (lat * Math.PI) / 360));
-  const computeFitZoom = (bounds: { north: number; south: number; east: number; west: number }, mapPx: { w: number; h: number }) => {
-    const WORLD_DIM = 256;
-    const ZOOM_MAX = 21;
-    const latFraction = (latRad(bounds.north) - latRad(bounds.south)) / Math.PI || 1e-9;
-    const lngDiff = bounds.east - bounds.west;
-    const lngFraction = ((lngDiff < 0 ? lngDiff + 360 : lngDiff) / 360) || 1e-9;
-    const latZoom = Math.log2(mapPx.h / WORLD_DIM / latFraction);
-    const lngZoom = Math.log2(mapPx.w / WORLD_DIM / lngFraction);
-    const zoom = Math.floor(Math.min(latZoom, lngZoom, ZOOM_MAX));
-    return Math.max(2, Math.min(zoom, ZOOM_MAX));
-  };
+  const [showMarkers, setShowMarkers] = useState(false);
 
   // Persist current job_id for quick retesting
   useEffect(() => {
@@ -89,84 +72,12 @@ export default function SearchUnfoldingPage() {
     }
   }, [showPreviewCard]);
 
-  // Animate map: hover from NW of bounds to work order, ease in/out, then zoom out to fit all techs; loop
+  // After the card map area settles, reveal markers with a short delay
   useEffect(() => {
-    if (!mapCenter) return;
-    let killed = false;
-
-    // Collect unique tech points
-    const unique = new Map<string, { lat: number; lng: number }>();
-    for (const c of candidates) {
-      const t = c.technicians;
-      if (!t || t.id == null || t.lat == null || t.lng == null) continue;
-      if (!unique.has(t.id)) unique.set(t.id, { lat: Number(t.lat), lng: Number(t.lng) });
-    }
-    const techPoints = Array.from(unique.values());
-
-    const jobPt = mapCenter; // job center from geocode/db
-    const allLats = [jobPt.lat, ...techPoints.map((p) => p.lat)];
-    const allLngs = [jobPt.lng, ...techPoints.map((p) => p.lng)];
-
-    const pad = 0.01; // ~1.1km lat padding
-    const bounds = allLats.length > 0
-      ? {
-          north: Math.max(...allLats) + pad,
-          south: Math.min(...allLats) - pad,
-          east: Math.max(...allLngs) + pad,
-          west: Math.min(...allLngs) - pad,
-        }
-      : { north: jobPt.lat + pad, south: jobPt.lat - pad, east: jobPt.lng + pad, west: jobPt.lng - pad };
-
-    const fitCenter = { lat: (bounds.north + bounds.south) / 2, lng: (bounds.east + bounds.west) / 2 };
-    const fitZoom = computeFitZoom(bounds, { w: 640, h: 240 });
-    const jobViewOffset = 0.003; // place view slightly "above" the job
-    const jobCenter = { lat: jobPt.lat + jobViewOffset, lng: jobPt.lng };
-    const zoomIn = Math.min(18, Math.max(fitZoom + 3, 14));
-
-    const steps = 16;
-    const intervalMs = 90;
-    const pauseMsAtJob = 900;
-    const pauseMsAtFit = 700;
-
-    const startFrom = { lat: bounds.north, lng: bounds.west }; // NW corner hover-in
-
-    let phase: 'toJob' | 'toFit' = 'toJob';
-
-    const run = () => {
-      if (killed) return;
-
-      const startCenter = phase === 'toJob' ? startFrom : jobCenter;
-      const endCenter = phase === 'toJob' ? jobCenter : fitCenter;
-      const startZoom = phase === 'toJob' ? fitZoom : zoomIn;
-      const endZoom = phase === 'toJob' ? zoomIn : fitZoom;
-
-      setMapViewCenter(startCenter);
-      setMapZoom(startZoom);
-
-      let i = 0;
-      const id = setInterval(() => {
-        if (killed) { clearInterval(id); return; }
-        i += 1;
-        const t = Math.min(1, i / steps);
-        const te = easeInOutCubic(t);
-        const lat = startCenter.lat + (endCenter.lat - startCenter.lat) * te;
-        const lng = startCenter.lng + (endCenter.lng - startCenter.lng) * te;
-        const zoom = Math.round(startZoom + (endZoom - startZoom) * te);
-        setMapViewCenter({ lat, lng });
-        setMapZoom(zoom);
-        setFrameKey((k) => k + 1);
-        if (t >= 1) {
-          clearInterval(id);
-          phase = phase === 'toJob' ? 'toFit' : 'toJob';
-          const pause = phase === 'toFit' ? pauseMsAtJob : pauseMsAtFit;
-          if (!killed) setTimeout(run, pause);
-        }
-      }, intervalMs);
-    };
-
-    run();
-    return () => { killed = true; };
-  }, [mapCenter, candidates, animKey]);
+    if (!cardSettled) return;
+    const id = setTimeout(() => setShowMarkers(true), 300);
+    return () => clearTimeout(id);
+  }, [cardSettled]);
 
   // Load job for map/address
   useEffect(() => {
@@ -256,10 +167,10 @@ export default function SearchUnfoldingPage() {
   };
 
   const staticMapUrl = useMemo(() => {
-    const center = mapViewCenter ?? mapCenter ?? (job?.lat != null && job?.lng != null ? { lat: job.lat, lng: job.lng } : { lat: 25.7634961, lng: -80.1905671 });
+    const center = mapCenter ?? (job?.lat != null && job?.lng != null ? { lat: job.lat, lng: job.lng } : { lat: 25.7634961, lng: -80.1905671 });
     if (!center) return null;
 
-    const base = `https://maps.googleapis.com/maps/api/staticmap?center=${center.lat},${center.lng}&zoom=${mapZoom}&size=640x240&scale=2&maptype=roadmap`;
+    const base = `https://maps.googleapis.com/maps/api/staticmap?center=${center.lat},${center.lng}&zoom=15&size=640x240&scale=2&maptype=roadmap`;
     const styles = [
       'style=element:geometry|color:0x1D1D20',
       'style=feature:water|element:geometry|color:0x0E0E12',
@@ -278,25 +189,26 @@ export default function SearchUnfoldingPage() {
     params.push(`markers=size:mid|color:0xEF4444|label:J|${center.lat},${center.lng}`);
 
     // Technician markers (blue, label T) with dedup by technician id
-    const unique = new Map<string, { lat: number; lng: number }>();
-    for (const c of candidates) {
-      const t = c.technicians;
-      if (!t || t.id == null || t.lat == null || t.lng == null) continue;
-      if (!unique.has(t.id)) unique.set(t.id, { lat: Number(t.lat), lng: Number(t.lng) });
-    }
-    const techPoints = Array.from(unique.values()).slice(0, 10);
+    if (showMarkers) {
+      const unique = new Map<string, { lat: number; lng: number }>();
+      for (const c of candidates) {
+        const t = c.technicians;
+        if (!t || t.id == null || t.lat == null || t.lng == null) continue;
+        if (!unique.has(t.id)) unique.set(t.id, { lat: Number(t.lat), lng: Number(t.lng) });
+      }
+      const techPoints = Array.from(unique.values()).slice(0, 10);
 
-    if (techPoints.length > 0) {
-      const locs = techPoints.map((p) => `${p.lat},${p.lng}`).join('|');
-      params.push(`markers=size:mid|color:0x3B82F6|label:T|${locs}`);
+      if (techPoints.length > 0) {
+        const locs = techPoints.map((p) => `${p.lat},${p.lng}`).join('|');
+        params.push(`markers=size:mid|color:0x3B82F6|label:T|${locs}`);
+      }
     }
 
     params.push(`key=${process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY}`);
-    params.push(`ver=${animKey}`);
-    params.push(`frame=${frameKey}`);
+    params.push(`ver=${animKey}-${showMarkers ? 'm1' : 'm0'}`);
 
     return params.join('&');
-  }, [mapCenter, mapViewCenter, mapZoom, candidates, animKey, frameKey, job?.lat, job?.lng]);
+  }, [mapCenter, candidates, animKey, showMarkers, job?.lat, job?.lng]);
 
   const handleShowReasons = (candidate: CandidateRow) => {
     const tech = candidate.technicians;
@@ -373,7 +285,12 @@ export default function SearchUnfoldingPage() {
               {/* Google Static Maps preview */}
               <div className="map-preview" onClick={() => { setAnimKey((k) => k + 1); setCardSettled(false); setTimeout(() => setCardSettled(true), 50); }}>
                 {staticMapUrl ? (
-                  <img alt="Work order location" src={staticMapUrl} onError={(e) => { (e.currentTarget as HTMLImageElement).style.opacity = '0'; }} />
+                  <img
+                    alt="Work order location"
+                    src={staticMapUrl}
+                    className={showMarkers ? 'map-img markers-pop' : 'map-img'}
+                    onError={(e) => { (e.currentTarget as HTMLImageElement).style.opacity = '0'; }}
+                  />
                 ) : (
                   <div className="map-fallback">Map unavailable</div>
                 )}
