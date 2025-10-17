@@ -31,43 +31,14 @@ const FormSchema = z.object({
 type FormData = z.infer<typeof FormSchema>;
 
 async function geocodeAddress(query: string) {
-  const token = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY;
-  if (!token) {
-    console.error('Google Maps API key not configured');
-    return { success: false } as const;
-  }
-
-  const url = `https://maps.googleapis.com/maps/api/geocode/json?address=${encodeURIComponent(query)}&key=${token}`;
-
   try {
-    const res = await fetch(url);
+    const res = await fetch(`/api/maps/geocode?q=${encodeURIComponent(query)}`);
+    if (!res.ok) return { success: false } as const;
     const data = await res.json();
-
-    if (data.status !== 'OK') {
-      console.error('Google Maps geocoding error:', data.status, data.error_message);
-      return { success: false } as const;
+    if (typeof data.lat === 'number' && typeof data.lng === 'number') {
+      return { success: true, lat: data.lat, lng: data.lng, city: data.city ?? null, state: data.state ?? null } as const;
     }
-
-    if (data.results && data.results.length > 0) {
-      const result = data.results[0];
-      const location = result.geometry.location;
-      const addressComponents = result.address_components;
-
-      const city = addressComponents.find((c: any) => c.types.includes('locality'))?.long_name ?? null;
-      const state = addressComponents.find((c: any) => c.types.includes('administrative_area_level_1'))?.short_name ?? null;
-
-      return {
-        success: true,
-        lat: location.lat,
-        lng: location.lng,
-        city,
-        state,
-      } as const;
-    }
-  } catch (error) {
-    console.error('Geocoding fetch error:', error);
-  }
-
+  } catch (error) {}
   return { success: false } as const;
 }
 
