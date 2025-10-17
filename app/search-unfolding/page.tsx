@@ -224,6 +224,8 @@ export default function SearchUnfoldingPage() {
         <h1 className="header-title" style={{ display: 'none' }}>Finding matches...</h1>
         <p className="header-subtitle" style={{ display: 'none' }}>We are looking for nearby compliant technicians.</p>
 
+        {/* Backdrop */}
+        {showPreviewCard && <div className="preview-backdrop" />}
         {/* Slide-in centered preview card */}
         {showPreviewCard && (
           <div ref={previewRef} className="slide-in-center-card">
