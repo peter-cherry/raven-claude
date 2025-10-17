@@ -43,6 +43,8 @@ export default function SearchUnfoldingPage() {
   const [previewMetrics, setPreviewMetrics] = useState<{ x: number; y: number; w: number; h: number } | null>(null);
   const [cardSettled, setCardSettled] = useState(false);
   const [animKey, setAnimKey] = useState(0);
+  const [mapZoom, setMapZoom] = useState<number>(15);
+  const [mapViewCenter, setMapViewCenter] = useState<{ lat: number; lng: number } | null>(null);
 
   // Persist current job_id for quick retesting
   useEffect(() => {
@@ -70,6 +72,33 @@ export default function SearchUnfoldingPage() {
       setCardSettled(false);
     }
   }, [showPreviewCard]);
+
+  // Animate map: start slightly offset + lower zoom, then pan/zoom to target
+  useEffect(() => {
+    if (!mapCenter) return;
+    const startZoom = 12;
+    const endZoom = 15;
+    const steps = 12;
+    const intervalMs = 80;
+    const start = { lat: mapCenter.lat + 0.01, lng: mapCenter.lng + 0.01 };
+
+    setMapViewCenter(start);
+    setMapZoom(startZoom);
+
+    let i = 0;
+    const id = setInterval(() => {
+      i += 1;
+      const t = Math.min(1, i / steps);
+      const lat = start.lat + (mapCenter.lat - start.lat) * t;
+      const lng = start.lng + (mapCenter.lng - start.lng) * t;
+      const zoom = Math.round(startZoom + (endZoom - startZoom) * t);
+      setMapViewCenter({ lat, lng });
+      setMapZoom(zoom);
+      if (t >= 1) clearInterval(id);
+    }, intervalMs);
+
+    return () => clearInterval(id);
+  }, [mapCenter, animKey]);
 
   // Load job for map/address
   useEffect(() => {
@@ -159,10 +188,10 @@ export default function SearchUnfoldingPage() {
   };
 
   const staticMapUrl = useMemo(() => {
-    const center = mapCenter ?? (job?.lat != null && job?.lng != null ? { lat: job.lat, lng: job.lng } : { lat: 25.7634961, lng: -80.1905671 });
+    const center = mapViewCenter ?? mapCenter ?? (job?.lat != null && job?.lng != null ? { lat: job.lat, lng: job.lng } : { lat: 25.7634961, lng: -80.1905671 });
     if (!center) return null;
 
-    const base = `https://maps.googleapis.com/maps/api/staticmap?center=${center.lat},${center.lng}&zoom=15&size=640x240&scale=2&maptype=roadmap`;
+    const base = `https://maps.googleapis.com/maps/api/staticmap?center=${center.lat},${center.lng}&zoom=${mapZoom}&size=640x240&scale=2&maptype=roadmap`;
     const styles = [
       'style=element:geometry|color:0x1D1D20',
       'style=feature:water|element:geometry|color:0x0E0E12',
@@ -180,14 +209,17 @@ export default function SearchUnfoldingPage() {
     // Highlight job location marker (red, label J)
     params.push(`markers=size:mid|color:0xEF4444|label:J|${center.lat},${center.lng}`);
 
-    // Technician markers (blue, label T)
-    const techPoints = candidates
-      .map((c) => c.technicians)
-      .filter((t): t is NonNullable<CandidateRow['technicians']> => !!t && t.lat != null && t.lng != null)
-      .slice(0, 10);
+    // Technician markers (blue, label T) with dedup by technician id
+    const unique = new Map<string, { lat: number; lng: number }>();
+    for (const c of candidates) {
+      const t = c.technicians;
+      if (!t || t.id == null || t.lat == null || t.lng == null) continue;
+      if (!unique.has(t.id)) unique.set(t.id, { lat: Number(t.lat), lng: Number(t.lng) });
+    }
+    const techPoints = Array.from(unique.values()).slice(0, 10);
 
     if (techPoints.length > 0) {
-      const locs = techPoints.map((t) => `${t.lat},${t.lng}`).join('|');
+      const locs = techPoints.map((p) => `${p.lat},${p.lng}`).join('|');
       params.push(`markers=size:mid|color:0x3B82F6|label:T|${locs}`);
     }
 
@@ -195,7 +227,7 @@ export default function SearchUnfoldingPage() {
     params.push(`ver=${animKey}`);
 
     return params.join('&');
-  }, [mapCenter, candidates, animKey, job?.lat, job?.lng]);
+  }, [mapCenter, mapViewCenter, mapZoom, candidates, animKey, job?.lat, job?.lng]);
 
   const handleShowReasons = (candidate: CandidateRow) => {
     const tech = candidate.technicians;
