@@ -45,7 +45,10 @@ export default function SearchUnfoldingPage() {
   const [animKey, setAnimKey] = useState(0);
   const [showMarkers, setShowMarkers] = useState(false);
   const [mapViewCenter, setMapViewCenter] = useState<{ lat: number; lng: number } | null>(null);
+  const [mapZoom, setMapZoom] = useState<number>(15);
   const [frameKey, setFrameKey] = useState(0);
+  const [mapAnimDone, setMapAnimDone] = useState(false);
+  const [allowTechStrips, setAllowTechStrips] = useState(false);
 
   // Persist current job_id for quick retesting
   useEffect(() => {
@@ -74,39 +77,95 @@ export default function SearchUnfoldingPage() {
     }
   }, [showPreviewCard]);
 
-  // One-shot hover-in: start ~100m NW of job, ease-in-out to job center, then show markers
+  // Cinematic sequence (~2s): zoom-out, fly-to, zoom-in; then markers, then tech strips
   useEffect(() => {
     if (!cardSettled || !mapCenter) return;
+
     setShowMarkers(false);
+    setMapAnimDone(false);
+    setAllowTechStrips(false);
 
     const easeInOutCubic = (t: number) => (t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2);
 
-    const meters = 100 * 1609.34; // 100 miles
-    const degLat = meters / 111320; // ~ meters per degree latitude
+    // Start ~100 miles NW
+    const meters = 100 * 1609.34;
+    const degLat = meters / 111320;
     const degLng = meters / (111320 * Math.cos(mapCenter.lat * Math.PI / 180));
-    const start = { lat: mapCenter.lat + degLat, lng: mapCenter.lng - degLng }; // NW offset
+    const startCenter = { lat: mapCenter.lat + degLat, lng: mapCenter.lng - degLng };
 
-    setMapViewCenter(start);
+    // Zoom targets
+    const zoomBird = 8;  // start
+    const zoomOut = 6;   // pull-back
+    const zoomIn = 15;   // final
 
-    let i = 0;
-    const steps = 18;
-    const intervalMs = 70;
-    const id = setInterval(() => {
-      i += 1;
-      const t = Math.min(1, i / steps);
-      const te = easeInOutCubic(t);
-      const lat = start.lat + (mapCenter.lat - start.lat) * te;
-      const lng = start.lng + (mapCenter.lng - start.lng) * te;
-      setMapViewCenter({ lat, lng });
-      setFrameKey((k) => k + 1);
-      if (t >= 1) {
-        clearInterval(id);
-        setMapViewCenter(mapCenter);
-        setTimeout(() => setShowMarkers(true), 50);
-      }
-    }, intervalMs);
+    // Durations
+    const d1 = 300; // zoom-out
+    const d2 = 900; // fly
+    const d3 = 600; // zoom-in
 
-    return () => clearInterval(id);
+    const tween = (
+      duration: number,
+      update: (t: number) => void,
+      done: () => void
+    ) => {
+      const intervalMs = 30;
+      const steps = Math.max(1, Math.round(duration / intervalMs));
+      let i = 0;
+      const id = setInterval(() => {
+        i += 1;
+        const t = Math.min(1, i / steps);
+        update(t);
+        setFrameKey((k) => k + 1);
+        if (t >= 1) { clearInterval(id); done(); }
+      }, intervalMs);
+      return id;
+    };
+
+    // Initial state
+    setMapViewCenter(startCenter);
+    setMapZoom(zoomBird);
+
+    let killed = false;
+    let currentId: any = null;
+
+    const phase3 = () => {
+      if (killed) return;
+      currentId = tween(d3, (t) => {
+        const te = easeInOutCubic(t);
+        const z = Math.round(zoomOut + (zoomIn - zoomOut) * te);
+        setMapZoom(z);
+      }, () => {
+        setMapAnimDone(true);
+        setShowMarkers(true);
+        setTimeout(() => setAllowTechStrips(true), 150);
+      });
+    };
+
+    const phase2 = () => {
+      if (killed) return;
+      const from = startCenter;
+      const to = mapCenter;
+      currentId = tween(d2, (t) => {
+        const te = easeInOutCubic(t);
+        const lat = from.lat + (to.lat - from.lat) * te;
+        const lng = from.lng + (to.lng - from.lng) * te;
+        setMapViewCenter({ lat, lng });
+      }, phase3);
+    };
+
+    const phase1 = () => {
+      if (killed) return;
+      const z0 = zoomBird;
+      const z1 = zoomOut;
+      currentId = tween(d1, (t) => {
+        const te = easeInOutCubic(t);
+        const z = Math.round(z0 + (z1 - z0) * te);
+        setMapZoom(z);
+      }, phase2);
+    };
+
+    phase1();
+    return () => { killed = true; if (currentId) clearInterval(currentId); };
   }, [cardSettled, mapCenter, animKey]);
 
   // Load job for map/address
@@ -200,7 +259,7 @@ export default function SearchUnfoldingPage() {
     const center = mapViewCenter ?? mapCenter ?? (job?.lat != null && job?.lng != null ? { lat: job.lat, lng: job.lng } : { lat: 25.7634961, lng: -80.1905671 });
     if (!center) return null;
 
-    const base = `https://maps.googleapis.com/maps/api/staticmap?center=${center.lat},${center.lng}&zoom=15&size=640x240&scale=2&maptype=roadmap`;
+    const base = `https://maps.googleapis.com/maps/api/staticmap?center=${center.lat},${center.lng}&zoom=${mapZoom}&size=640x240&scale=2&maptype=roadmap`;
     const styles = [
       'style=element:geometry|color:0x1D1D20',
       'style=feature:water|element:geometry|color:0x0E0E12',
@@ -239,7 +298,7 @@ export default function SearchUnfoldingPage() {
     params.push(`frame=${frameKey}`);
 
     return params.join('&');
-  }, [mapCenter, mapViewCenter, candidates, animKey, showMarkers, frameKey, job?.lat, job?.lng]);
+  }, [mapCenter, mapViewCenter, mapZoom, candidates, animKey, showMarkers, frameKey, job?.lat, job?.lng]);
 
   const handleShowReasons = (candidate: CandidateRow) => {
     const tech = candidate.technicians;
@@ -347,7 +406,7 @@ export default function SearchUnfoldingPage() {
               <div className="reveal-stage">
                 <div className="reveal-mask" aria-hidden="true"></div>
                 <div className="tech-strip-list" key={animKey}>
-                  {cardSettled && candidates.slice(0, 5).map((c) => {
+                  {allowTechStrips && candidates.slice(0, 5).map((c) => {
                     const tech = c.technicians;
                     const coiColor = ((): string => {
                       switch (tech?.coi_state) {
