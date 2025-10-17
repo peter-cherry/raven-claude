@@ -8,6 +8,7 @@ interface CandidateRow {
   id: string;
   distance_m: number | null;
   duration_sec: number | null;
+  match_score: number | null;
   technicians: {
     id: string;
     full_name: string | null;
@@ -442,7 +443,11 @@ export default function SearchUnfoldingPage() {
                           <span className="light-dot" style={{ backgroundColor: licColor }} />
                         </div>
 
-                        <div className="tech-rating">{(tech?.average_rating ?? 0).toFixed(1)}</div>
+                        <div className="tech-rating">
+                          {c.match_score != null
+                            ? Math.round(c.match_score * 100)
+                            : (tech?.average_rating ?? 0).toFixed(1)}
+                        </div>
 
                         <button className="tech-reasons" onClick={() => handleShowReasons(c)}>See reasons →</button>
 
