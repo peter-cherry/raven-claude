@@ -230,14 +230,13 @@ export default function SearchUnfoldingPage() {
             <div className="slide-in-center-inner" style={{ width: '100%', padding: 0, display: 'grid', gap: 0 }}>
               {/* Google Static Maps preview */}
               <div className="map-preview" onClick={() => { setAnimKey((k) => k + 1); setCardSettled(false); setTimeout(() => setCardSettled(true), 50); }}>
-                {mapCenter ? (
-                  <img
-                    alt="Work order location"
-                    src={`https://maps.googleapis.com/maps/api/staticmap?center=${mapCenter.lat},${mapCenter.lng}&zoom=15&size=640x240&scale=2&maptype=roadmap&style=element:geometry|color:0x1D1D20&style=feature:water|element:geometry|color:0x0E0E12&style=feature:road|element:geometry|color:0x2A2931&style=feature:poi|element:geometry|color:0x1D1D20&style=feature:all|element:labels.text.fill|color:0xA0A0A8&style=feature:all|element:labels.text.stroke|color:0x1D1D20&key=${process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY}&ver=${animKey}`}
-                  />
-                ) : (
-                  <div className="map-fallback">Map preview</div>
-                )}
+                {(() => {
+                  const center = mapCenter ?? (job?.lat != null && job?.lng != null ? { lat: job.lat, lng: job.lng } : { lat: 25.7634961, lng: -80.1905671 });
+                  const src = `https://maps.googleapis.com/maps/api/staticmap?center=${center.lat},${center.lng}&zoom=15&size=640x240&scale=2&maptype=roadmap&style=element:geometry|color:0x1D1D20&style=feature:water|element:geometry|color:0x0E0E12&style=feature:road|element:geometry|color:0x2A2931&style=feature:poi|element:geometry|color:0x1D1D20&style=feature:all|element:labels.text.fill|color:0xA0A0A8&style=feature:all|element:labels.text.stroke|color:0x1D1D20&key=${process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY}&ver=${animKey}`;
+                  return (
+                    <img alt="Work order location" src={src} onError={(e) => { (e.currentTarget as HTMLImageElement).style.opacity = '0'; }} />
+                  );
+                })()}
                 {/* Address overlay inside map, bottom-right with 5px offset */}
                 <div className="wo-address-line">
                   <span className="addr-text">{job?.address_text || 'Address not available'}</span>
