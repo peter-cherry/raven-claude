@@ -81,7 +81,7 @@ export default function SearchUnfoldingPage() {
 
     const easeInOutCubic = (t: number) => (t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2);
 
-    const meters = 100;
+    const meters = 100 * 1609.34; // 100 miles
     const degLat = meters / 111320; // ~ meters per degree latitude
     const degLng = meters / (111320 * Math.cos(mapCenter.lat * Math.PI / 180));
     const start = { lat: mapCenter.lat + degLat, lng: mapCenter.lng - degLng }; // NW offset
