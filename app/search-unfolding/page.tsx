@@ -80,22 +80,20 @@ export default function SearchUnfoldingPage() {
       .then(({ data }) => setJob(data as any));
   }, [jobId]);
 
-  // Determine map center with fallback: use job lat/lng; else geocode address; else default Miami
+  // Determine map center with fallback: use job lat/lng; else server geocode; else default Miami
   useEffect(() => {
-    const key = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY;
     if (!job) return;
     if (job.lat != null && job.lng != null) {
       setMapCenter({ lat: job.lat, lng: job.lng });
       return;
     }
     const addr = [job.address_text, job.city, job.state].filter(Boolean).join(', ');
-    if (addr && key) {
-      fetch(`https://maps.googleapis.com/maps/api/geocode/json?address=${encodeURIComponent(addr)}&key=${key}`)
+    if (addr) {
+      fetch(`/api/maps/geocode?q=${encodeURIComponent(addr)}`)
         .then((r) => r.json())
         .then((g) => {
-          const loc = g?.results?.[0]?.geometry?.location;
-          if (loc && typeof loc.lat === 'number' && typeof loc.lng === 'number') {
-            setMapCenter({ lat: loc.lat, lng: loc.lng });
+          if (typeof g?.lat === 'number' && typeof g?.lng === 'number') {
+            setMapCenter({ lat: g.lat, lng: g.lng });
           } else {
             setMapCenter({ lat: 25.7634961, lng: -80.1905671 });
           }
