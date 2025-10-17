@@ -87,8 +87,8 @@ export default function SearchUnfoldingPage() {
 
     const easeInOutCubic = (t: number) => (t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2);
 
-    // Start ~100m away in a random direction
-    const meters = 100; // 100 meters
+    // Start ~100 miles away in a random direction
+    const meters = 100 * 1609.34; // 100 miles
     const theta = Math.random() * Math.PI * 2;
     const latRad = (mapCenter.lat * Math.PI) / 180;
     const dLat = (meters * Math.cos(theta)) / 111320;
