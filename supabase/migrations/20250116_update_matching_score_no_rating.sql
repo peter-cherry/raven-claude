@@ -35,6 +35,15 @@ BEGIN
     RETURN;
   END IF;
 
+  -- Optional overrides from parameters
+  IF p_trade IS NOT NULL THEN
+    v_trade := p_trade;
+  END IF;
+  IF p_lat IS NOT NULL AND p_lng IS NOT NULL THEN
+    v_job_lat := p_lat::DOUBLE PRECISION;
+    v_job_lng := p_lng::DOUBLE PRECISION;
+  END IF;
+
   -- Insert/Upsert candidates with computed distance/duration and distance-only score
   INSERT INTO job_candidates (org_id, job_id, technician_id, distance_m, duration_sec, match_score, created_at, updated_at)
   SELECT
