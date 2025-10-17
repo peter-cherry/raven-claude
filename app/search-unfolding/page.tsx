@@ -44,6 +44,8 @@ export default function SearchUnfoldingPage() {
   const [cardSettled, setCardSettled] = useState(false);
   const [animKey, setAnimKey] = useState(0);
   const [showMarkers, setShowMarkers] = useState(false);
+  const [mapViewCenter, setMapViewCenter] = useState<{ lat: number; lng: number } | null>(null);
+  const [frameKey, setFrameKey] = useState(0);
 
   // Persist current job_id for quick retesting
   useEffect(() => {
@@ -72,12 +74,40 @@ export default function SearchUnfoldingPage() {
     }
   }, [showPreviewCard]);
 
-  // After the card map area settles, reveal markers with a short delay
+  // One-shot hover-in: start ~100m NW of job, ease-in-out to job center, then show markers
   useEffect(() => {
-    if (!cardSettled) return;
-    const id = setTimeout(() => setShowMarkers(true), 300);
-    return () => clearTimeout(id);
-  }, [cardSettled]);
+    if (!cardSettled || !mapCenter) return;
+    setShowMarkers(false);
+
+    const easeInOutCubic = (t: number) => (t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2);
+
+    const meters = 100;
+    const degLat = meters / 111320; // ~ meters per degree latitude
+    const degLng = meters / (111320 * Math.cos(mapCenter.lat * Math.PI / 180));
+    const start = { lat: mapCenter.lat + degLat, lng: mapCenter.lng - degLng }; // NW offset
+
+    setMapViewCenter(start);
+
+    let i = 0;
+    const steps = 18;
+    const intervalMs = 70;
+    const id = setInterval(() => {
+      i += 1;
+      const t = Math.min(1, i / steps);
+      const te = easeInOutCubic(t);
+      const lat = start.lat + (mapCenter.lat - start.lat) * te;
+      const lng = start.lng + (mapCenter.lng - start.lng) * te;
+      setMapViewCenter({ lat, lng });
+      setFrameKey((k) => k + 1);
+      if (t >= 1) {
+        clearInterval(id);
+        setMapViewCenter(mapCenter);
+        setTimeout(() => setShowMarkers(true), 50);
+      }
+    }, intervalMs);
+
+    return () => clearInterval(id);
+  }, [cardSettled, mapCenter, animKey]);
 
   // Load job for map/address
   useEffect(() => {
@@ -167,7 +197,7 @@ export default function SearchUnfoldingPage() {
   };
 
   const staticMapUrl = useMemo(() => {
-    const center = mapCenter ?? (job?.lat != null && job?.lng != null ? { lat: job.lat, lng: job.lng } : { lat: 25.7634961, lng: -80.1905671 });
+    const center = mapViewCenter ?? mapCenter ?? (job?.lat != null && job?.lng != null ? { lat: job.lat, lng: job.lng } : { lat: 25.7634961, lng: -80.1905671 });
     if (!center) return null;
 
     const base = `https://maps.googleapis.com/maps/api/staticmap?center=${center.lat},${center.lng}&zoom=15&size=640x240&scale=2&maptype=roadmap`;
@@ -206,9 +236,10 @@ export default function SearchUnfoldingPage() {
 
     params.push(`key=${process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY}`);
     params.push(`ver=${animKey}-${showMarkers ? 'm1' : 'm0'}`);
+    params.push(`frame=${frameKey}`);
 
     return params.join('&');
-  }, [mapCenter, candidates, animKey, showMarkers, job?.lat, job?.lng]);
+  }, [mapCenter, mapViewCenter, candidates, animKey, showMarkers, frameKey, job?.lat, job?.lng]);
 
   const handleShowReasons = (candidate: CandidateRow) => {
     const tech = candidate.technicians;
