@@ -239,8 +239,8 @@ body {
 .tech-strip-list > .tech-strip:nth-child(5) { --stack-offset: calc(-4 * (var(--row-h) + var(--row-gap))); }
 
 .tech-ident { display: grid; gap: 2px; text-align: left; min-width: 0; }
-.tech-name { font-weight: 700; font-size: 14px; color: var(--text-primary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.tech-distance { font-size: 12px; color: var(--text-secondary); }
+.tech-name { font-weight: 700; font-size: 14px; color: var(--text-primary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-top: 3px; }
+.tech-distance { font-size: 12px; color: var(--text-secondary); margin-top: -2px; }
 
 .tech-lights { display: inline-flex; align-items: center; gap: 10px; justify-content: center; }
 .light-dot { width: 16px; height: 16px; border-radius: 50%; border: 2px solid rgba(255,255,255,0.08); }
