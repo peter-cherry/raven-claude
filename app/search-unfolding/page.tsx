@@ -481,7 +481,18 @@ export default function SearchUnfoldingPage() {
                           return <div className={`tech-rating ${scoreClass}`}>{pct}</div>;
                         })()}
 
-                        <button className="tech-reasons" onClick={() => handleShowReasons(c)}>See reasons →</button>
+                        {(() => {
+                          const pct = c.match_score != null
+                            ? Math.round(Number(c.match_score) * 100)
+                            : Math.round((computeMatchScore(c) ?? 0) * 100);
+                          const label = pct >= 90 ? 'Fully Compliant' : pct >= 80 ? 'Mostly Compliant' : pct >= 70 ? 'Needs Attention' : pct >= 60 ? 'Non-Compliant' : 'Blocked';
+                          const scoreClass = pct >= 80 ? 'score-high' : pct >= 60 ? 'score-med' : 'score-low';
+                          return (
+                            <button className={`tech-reasons ${scoreClass}`} onClick={() => handleShowReasons(c)}>
+                              {label} — {pct}%
+                            </button>
+                          );
+                        })()}
 
                         <button className="primary-button tech-assign" onClick={() => router.push(`/jobs/${jobId}`)}>Assign</button>
                       </div>
