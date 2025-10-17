@@ -223,18 +223,7 @@ export default function SearchUnfoldingPage() {
     return () => { mounted = false; clearInterval(id); };
   }, [jobId]);
 
-  // Persist match_score to DB when missing or outdated
-  useEffect(() => {
-    if (!candidates?.length) return;
-    const updates = candidates.map(async (c) => {
-      const computed = computeMatchScore(c);
-      if (computed == null) return;
-      if (c.match_score == null || Math.abs(Number(c.match_score) - computed) > 0.01) {
-        await supabase.from('job_candidates').update({ match_score: computed }).eq('id', c.id);
-      }
-    });
-    void Promise.allSettled(updates);
-  }, [candidates]);
+  // Match score is computed in DB via RPC and read-only here.
 
   const getComplianceScore = (tech: CandidateRow['technicians']) => {
     if (!tech) return 0;
