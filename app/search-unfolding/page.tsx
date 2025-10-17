@@ -47,6 +47,8 @@ export default function SearchUnfoldingPage() {
   const [mapViewCenter, setMapViewCenter] = useState<{ lat: number; lng: number } | null>(null);
   const [frameKey, setFrameKey] = useState(0);
 
+  const easeInOutCubic = (t: number) => (t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2);
+
   // Persist current job_id for quick retesting
   useEffect(() => {
     if (jobId) {
@@ -95,9 +97,10 @@ export default function SearchUnfoldingPage() {
         if (killed) { clearInterval(id); return; }
         i += 1;
         const t = Math.min(1, i / steps);
-        const lat = start.lat + (mapCenter.lat - start.lat) * t;
-        const lng = start.lng + (mapCenter.lng - start.lng) * t;
-        const zoom = Math.round(startZoom + (endZoom - startZoom) * t);
+        const te = easeInOutCubic(t);
+        const lat = start.lat + (mapCenter.lat - start.lat) * te;
+        const lng = start.lng + (mapCenter.lng - start.lng) * te;
+        const zoom = Math.round(startZoom + (endZoom - startZoom) * te);
         setMapViewCenter({ lat, lng });
         setMapZoom(zoom);
         setFrameKey((k) => k + 1); // cache-bust frames
