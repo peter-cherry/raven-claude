@@ -45,6 +45,7 @@ export default function SearchUnfoldingPage() {
   const [animKey, setAnimKey] = useState(0);
   const [mapZoom, setMapZoom] = useState<number>(15);
   const [mapViewCenter, setMapViewCenter] = useState<{ lat: number; lng: number } | null>(null);
+  const [frameKey, setFrameKey] = useState(0);
 
   // Persist current job_id for quick retesting
   useEffect(() => {
@@ -73,31 +74,42 @@ export default function SearchUnfoldingPage() {
     }
   }, [showPreviewCard]);
 
-  // Animate map: start slightly offset + lower zoom, then pan/zoom to target
+  // Animate map: start slightly offset + lower zoom, then pan/zoom to target, loop continuously
   useEffect(() => {
     if (!mapCenter) return;
+    let killed = false;
+
     const startZoom = 12;
     const endZoom = 15;
-    const steps = 12;
-    const intervalMs = 80;
-    const start = { lat: mapCenter.lat + 0.01, lng: mapCenter.lng + 0.01 };
+    const steps = 14;
+    const intervalMs = 90;
+    const pauseMs = 700;
 
-    setMapViewCenter(start);
-    setMapZoom(startZoom);
+    const run = () => {
+      if (killed) return;
+      const start = { lat: mapCenter.lat + 0.01, lng: mapCenter.lng + 0.01 };
+      setMapViewCenter(start);
+      setMapZoom(startZoom);
+      let i = 0;
+      const id = setInterval(() => {
+        if (killed) { clearInterval(id); return; }
+        i += 1;
+        const t = Math.min(1, i / steps);
+        const lat = start.lat + (mapCenter.lat - start.lat) * t;
+        const lng = start.lng + (mapCenter.lng - start.lng) * t;
+        const zoom = Math.round(startZoom + (endZoom - startZoom) * t);
+        setMapViewCenter({ lat, lng });
+        setMapZoom(zoom);
+        setFrameKey((k) => k + 1); // cache-bust frames
+        if (t >= 1) {
+          clearInterval(id);
+          if (!killed) setTimeout(run, pauseMs);
+        }
+      }, intervalMs);
+    };
 
-    let i = 0;
-    const id = setInterval(() => {
-      i += 1;
-      const t = Math.min(1, i / steps);
-      const lat = start.lat + (mapCenter.lat - start.lat) * t;
-      const lng = start.lng + (mapCenter.lng - start.lng) * t;
-      const zoom = Math.round(startZoom + (endZoom - startZoom) * t);
-      setMapViewCenter({ lat, lng });
-      setMapZoom(zoom);
-      if (t >= 1) clearInterval(id);
-    }, intervalMs);
-
-    return () => clearInterval(id);
+    run();
+    return () => { killed = true; };
   }, [mapCenter, animKey]);
 
   // Load job for map/address
@@ -225,9 +237,10 @@ export default function SearchUnfoldingPage() {
 
     params.push(`key=${process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY}`);
     params.push(`ver=${animKey}`);
+    params.push(`frame=${frameKey}`);
 
     return params.join('&');
-  }, [mapCenter, mapViewCenter, mapZoom, candidates, animKey, job?.lat, job?.lng]);
+  }, [mapCenter, mapViewCenter, mapZoom, candidates, animKey, frameKey, job?.lat, job?.lng]);
 
   const handleShowReasons = (candidate: CandidateRow) => {
     const tech = candidate.technicians;
