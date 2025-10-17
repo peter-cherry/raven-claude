@@ -194,11 +194,15 @@ body {
 .wo-error { color: var(--error, #EF4444); font-size: 12px; margin-top: 8px; }
 
 /* Slide-in center card */
-.slide-in-center-card { position: fixed; top: 50%; left: 50%; width: 890px; height: 710px; max-width: 92vw; background: var(--bg-secondary); border: 2px solid var(--border-accent); border-radius: 12px; box-shadow: var(--shadow-md, 0 4px 12px rgba(0,0,0,0.35)); z-index: 1; pointer-events: none; transform: translate3d(-50%, calc(100vh + 10px), 0); animation: slideInCenterFromBelow .9s cubic-bezier(0.22, 0.61, 0.36, 1) forwards; will-change: transform; overflow: hidden; backface-visibility: hidden; transform-style: preserve-3d; contain: layout paint; } @media (max-width: 1024px) { .slide-in-center-card { width: min(890px, 92vw); height: min(710px, calc(100vh - 120px)); } }
+.slide-in-center-card { position: fixed; top: 50%; left: 50%; width: 890px; height: 720px; max-width: 92vw; background: var(--bg-secondary); border: 2px solid var(--border-accent); border-radius: 12px; box-shadow: var(--shadow-md, 0 4px 12px rgba(0,0,0,0.35)); z-index: 2; pointer-events: none; transform: translate3d(-50%, calc(100vh + 10px), 0); animation: slideInCenterFromBelow .9s cubic-bezier(0.22, 0.61, 0.36, 1) forwards; will-change: transform; overflow: hidden; backface-visibility: hidden; transform-style: preserve-3d; contain: layout paint; } @media (max-width: 1024px) { .slide-in-center-card { width: min(890px, 92vw); height: min(720px, calc(100vh - 120px)); } }
 .slide-in-center-inner { height: 100%; display: grid; place-items: start center; text-align: center; padding: 0; position: relative; }
 .slide-in-title { font-weight: 700; font-size: 18px; color: var(--text-primary); }
 .slide-in-sub { font-size: 14px; color: var(--text-secondary); }
 .slide-in-metrics { position: absolute; bottom: 8px; right: 12px; font-size: 12px; color: var(--text-secondary); }
+
+/* Backdrop blur behind preview */
+.preview-backdrop { position: fixed; inset: 0; backdrop-filter: blur(8px); background: rgba(0,0,0,0.25); opacity: 0; animation: backdropFadeIn .35s ease forwards; z-index: 1; pointer-events: none; }
+@keyframes backdropFadeIn { from { opacity: 0; } to { opacity: 1; } }
 
 /* Map preview inside slide-in card */
 .map-preview { width: calc(100% - 40px); height: 215px; margin: 20px 20px 10px 20px; border-radius: 10px; overflow: hidden; border: 1.5px solid var(--border-accent); background: #111; position: relative; }
@@ -214,7 +218,7 @@ body {
 .reveal-mask { position: absolute; top: -45px; left: 0; right: 0; height: 45px; background: var(--bg-secondary); z-index: 2; pointer-events: none; }
 .reveal-mask::after { content: ""; position: absolute; left: 10px; right: 10px; top: 45px; height: 0; box-shadow: 0 4px 3.5px rgba(124, 111, 130, 0.25); }
 .tech-strip-list { display: grid; gap: 10px; place-items: center; position: relative; --row-h: 45px; --row-gap: 10px; }
-.tech-strip { width: 865px; height: 45px; margin: 0 auto; background: #17171A; border: 1px solid #252529; border-radius: 12px; display: grid; grid-template-columns: 1fr 48px 42px auto auto; align-items: center; padding: 0 16px; gap: 12px; opacity: 0; transform: translateY(var(--stack-offset, 0)); animation: unstackDown .9s cubic-bezier(0.16, 1, 0.3, 1) forwards; will-change: transform, opacity; }
+.tech-strip { width: 865px; height: 45px; margin: 0 auto; background: #17171A; border: 1px solid #252529; border-radius: 12px; display: grid; grid-template-columns: 1fr 48px 42px auto auto; align-items: center; padding: 0 16px; gap: 12px; opacity: 0; transform: translateY(var(--stack-offset, 0)); animation: unstackDown 1s cubic-bezier(0.2, 0.8, 0.2, 1) forwards; will-change: transform, opacity; }
 .tech-strip-list > .tech-strip:nth-child(1) { --stack-offset: 0px; }
 .tech-strip-list > .tech-strip:nth-child(2) { --stack-offset: calc(-1 * (var(--row-h) + var(--row-gap))); }
 .tech-strip-list > .tech-strip:nth-child(3) { --stack-offset: calc(-2 * (var(--row-h) + var(--row-gap))); }
