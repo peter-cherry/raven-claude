@@ -12,6 +12,10 @@ DROP FUNCTION IF EXISTS find_matching_technicians(UUID) CASCADE;
 
 CREATE OR REPLACE FUNCTION find_matching_technicians(
   p_job_id UUID,
+  p_lat DECIMAL DEFAULT NULL,
+  p_lng DECIMAL DEFAULT NULL,
+  p_trade TEXT DEFAULT NULL,
+  p_state TEXT DEFAULT NULL,
   p_max_distance_m NUMERIC DEFAULT 50000
 ) RETURNS void
 LANGUAGE plpgsql
